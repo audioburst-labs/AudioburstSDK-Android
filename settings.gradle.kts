@@ -1,2 +1,2 @@
 rootProject.name = "AudioburstSDK-Android"
-include ':player'
+include(":player")
