@@ -5,3 +5,8 @@ plugins {
 }
 
 val archiveName by extra(Constants.Library.playerArchiveName)
+
+dependencies {
+    exoPlayerDependencies()
+    implementation(Dependencies.MobileLibrary.library)
+}
