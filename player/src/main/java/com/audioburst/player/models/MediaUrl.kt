@@ -1,27 +1,35 @@
 package com.audioburst.player.models
 
-internal sealed class MediaUrl {
-    abstract val url: String
+public sealed class MediaUrl {
+    public abstract val url: String
 
-    companion object {
-        private const val HLS_EXTENSION = ".m3u8"
-        private const val PROGRESSIVE_EXTENSION = ".mp3"
-        private const val STREAM_EXTENSION = ".ts"
+    public class Burst(override val url: String) : MediaUrl()
+    public class Source(override val url: String) : MediaUrl()
+    public class Advertisement(override val url: String) : MediaUrl()
 
-        fun create(url: String): MediaUrl =
-            when {
-                url.contains(PROGRESSIVE_EXTENSION) -> Progressive(url)
-                url.contains(HLS_EXTENSION) -> Hls(url)
-                else -> HlsWithAd(url)
-            }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-        fun isMediaUrl(url: String): Boolean =
-            url.contains(PROGRESSIVE_EXTENSION) || url.contains(HLS_EXTENSION) || url.contains(STREAM_EXTENSION)
+        other as MediaUrl
+
+        if (url != other.url) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return url.hashCode()
+    }
+
+    private val className: String
+        get() = when (this) {
+            is Advertisement -> "Advertisement"
+            is Burst -> "Burst"
+            is Source -> "Source"
+        }
+
+    override fun toString(): String {
+        return "$className(url=$url)"
     }
 }
-
-internal data class Progressive(override val url: String) : MediaUrl()
-
-internal data class Hls(override val url: String) : MediaUrl()
-
-internal data class HlsWithAd(override val url: String) : MediaUrl()

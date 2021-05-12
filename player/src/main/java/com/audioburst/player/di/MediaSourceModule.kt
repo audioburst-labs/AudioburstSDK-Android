@@ -90,7 +90,7 @@ internal class MediaSourceModule(
 
     companion object {
         private const val DOWNLOAD_CONTENT_DIRECTORY = "downloads"
-        private const val CACHE_SIZE_BYTES: Long = 1024 * 1024 * 200
+        private const val CACHE_SIZE_BYTES: Long = 0
         private const val COMPONENT_NAME = "AudioburstSDK"
         private const val PARALLEL_DOWNLOADS = 3
     }

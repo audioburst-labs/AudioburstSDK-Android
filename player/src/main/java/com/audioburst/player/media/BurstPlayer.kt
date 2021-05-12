@@ -2,6 +2,7 @@ package com.audioburst.player.media
 
 import com.audioburst.library.models.Burst
 import com.audioburst.library.models.Playlist
+import com.audioburst.player.models.MediaUrl
 import kotlinx.coroutines.flow.StateFlow
 
 public interface BurstPlayer {
@@ -12,7 +13,7 @@ public interface BurstPlayer {
 
     public val currentPlaylist: StateFlow<Playlist?>
 
-    public val adState: StateFlow<AdState>
+    public val adState: StateFlow<AdState?>
 
     public val currentMediaUrl: String?
 
@@ -44,8 +45,6 @@ public interface BurstPlayer {
 
     public fun currentPlayBackPosition(): Long
 
-    public fun setAdvertisementUrl(burst: Burst, url: String)
-
     public fun clear()
 
     public data class State(
@@ -68,7 +67,7 @@ public interface BurstPlayer {
         }
         public data class Media(
             val burst: Burst,
-            val mediaUrl: String,
+            val mediaUrl: MediaUrl,
             val positionInPlaylist: Int,
             val duration: Long,
         ): NowPlaying()
@@ -77,6 +76,5 @@ public interface BurstPlayer {
     public data class AdState(
         val isAvailableInCurrentMedia: Boolean = false,
         val canSkip: Boolean = false,
-        val isInAd: Boolean = false,
     )
 }

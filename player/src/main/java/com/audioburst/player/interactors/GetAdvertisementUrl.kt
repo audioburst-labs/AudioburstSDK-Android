@@ -1,15 +1,26 @@
 package com.audioburst.player.interactors
 
-import com.audioburst.library.models.Playlist
+import com.audioburst.library.models.Burst
+import com.audioburst.library.models.Result
+import com.audioburst.player.data.Repository
+import com.audioburst.player.utils.AdUrlCache
 
 internal interface GetAdvertisementUrl {
 
-    suspend operator fun invoke(url: String, currentPlaylist: Playlist): String?
+    suspend operator fun invoke(url: String, burst: Burst): String
 }
-// TODO: To be implemented later
-internal class NoOpGetAdvertisementUrl: GetAdvertisementUrl {
 
-    override suspend fun invoke(url: String, currentPlaylist: Playlist): String? {
-        return null
-    }
+internal class GetAdvertisementUrlInteractor(
+    private val adUrlCache: AdUrlCache,
+    private val repository: Repository,
+) : GetAdvertisementUrl {
+
+    override suspend fun invoke(url: String, burst: Burst): String =
+        when (val result = repository.getAdUrl(burst)) {
+            is Result.Data -> {
+                adUrlCache.set(burst, result.value)
+                result.value
+            }
+            is Result.Error -> burst.audioUrl
+        }
 }

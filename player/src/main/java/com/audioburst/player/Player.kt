@@ -10,8 +10,8 @@ public object Player {
     internal lateinit var mediaSessionConnection: MediaSessionConnection
     internal lateinit var burstPlayer: BurstPlayer
 
-    public fun init(context: Context) {
-        Injector.init(context)
+    public fun init(context: Context, applicationKey: String) {
+        Injector.init(context, applicationKey)
         Injector.inject(this)
         initMediaSession()
     }

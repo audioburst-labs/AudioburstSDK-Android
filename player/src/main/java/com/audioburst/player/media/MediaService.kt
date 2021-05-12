@@ -7,16 +7,21 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.audioburst.library.AudioburstLibrary
+import com.audioburst.library.models.PlaybackState
+import com.audioburst.library.utils.PlaybackStateListener
 import com.audioburst.player.di.Injector
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.*
 
 internal class MediaService : MediaBrowserServiceCompat() {
     lateinit var scope: CoroutineScope
     lateinit var exoPlayer: ExoPlayer
     lateinit var burstPlayer: BurstPlayer
+    lateinit var audioburstLibrary: AudioburstLibrary
     lateinit var mediaControllerCallback: MediaControllerCallback
 
     private lateinit var mediaSession: MediaSessionCompat
@@ -48,6 +53,33 @@ internal class MediaService : MediaBrowserServiceCompat() {
             setPlayer(exoPlayer)
             setQueueNavigator(MediaQueueNavigator(mediaSession))
         }
+
+        observePlayingState()
+        audioburstLibrary.setPlaybackStateListener(playbackStateListener)
+    }
+
+    private fun observePlayingState() {
+        burstPlayer.state
+            .map { it.isPlaying }
+            .debounce(timeoutMillis = 100)
+            .distinctUntilChanged()
+            .onEach { isPlaying ->
+                if (isPlaying) {
+                    audioburstLibrary.start()
+                } else {
+                    audioburstLibrary.stop()
+                }
+            }
+            .launchIn(scope)
+    }
+
+    private val playbackStateListener: PlaybackStateListener = PlaybackStateListener {
+        burstPlayer.currentMediaUrl?.let { url ->
+            PlaybackState(
+                positionMillis = burstPlayer.currentPlayBackPosition(),
+                url = url,
+            )
+        }
     }
 
     override fun onTaskRemoved(rootIntent: Intent) {
@@ -62,6 +94,7 @@ internal class MediaService : MediaBrowserServiceCompat() {
         mediaSession.release()
         burstPlayer.clear()
         scope.cancel()
+        audioburstLibrary.removePlaybackStateListener(playbackStateListener)
     }
 
     override fun onGetRoot(clientPackageName: String, clientUid: Int, rootHints: Bundle?): BrowserRoot? {
