@@ -10,6 +10,7 @@ import com.audioburst.player.di.provider.singleton
 import com.audioburst.player.interactors.GetAdvertisementUrl
 import com.audioburst.player.interactors.GetAdvertisementUrlInteractor
 import com.audioburst.player.media.*
+import com.audioburst.player.media.events.ExoPlayerEventsFlow
 import com.audioburst.player.media.events.PlayerEventFlow
 import com.audioburst.player.media.mappers.BurstToMediaItemMapper
 import com.audioburst.player.models.AppDispatchers
@@ -42,6 +43,9 @@ internal class MediaModule(
     }
 
     private val analyticsCollectorProvider: Provider<AnalyticsCollector> = singleton { AnalyticsCollector(Clock.DEFAULT) }
+    private val mediaTotalPlayTimeProvider: Provider<MediaTotalPlayTimeProvider> = provider {
+        AnalyticCollectorMediaTotalPlayTimeProvider(analyticsCollector = analyticsCollectorProvider.get())
+    }
     private val adUriResolverProvider: Provider<AdUriResolver> = provider {
         AdUriResolver(
             currentPlaylistCache = currentPlaylistCacheProvider.get(),
@@ -58,7 +62,7 @@ internal class MediaModule(
         )
     }
     private val playerEventFlowProvider: Provider<PlayerEventFlow> = provider {
-        PlayerEventFlow(
+        ExoPlayerEventsFlow(
             exoPlayer = exoPlayerProvider.get(),
             appDispatchers = appDispatchersProvider.get(),
         )
@@ -82,10 +86,10 @@ internal class MediaModule(
         )
     }
     private val listenedMediaObserverProvider: Provider<ListenedMediaObserver> = provider {
-        ListenedMediaObserver(
+        TimeBasedListenedMediaObserver(
             scope = libraryScopeProvider.get(),
             playingAwareTimerCreator = playingAwareTimerCreatorProvider.get(),
-            analyticsCollector = analyticsCollectorProvider.get(),
+            mediaTotalPlayTimeProvider = mediaTotalPlayTimeProvider.get(),
         )
     }
     private val adStateProviderProvider: Provider<AdStateProvider> = provider {

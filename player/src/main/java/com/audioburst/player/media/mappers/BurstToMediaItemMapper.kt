@@ -39,7 +39,7 @@ internal class BurstToMediaItemMapper {
         get() = if (isAdAvailable) {
             Identity.mp3(value = BurstIdUri(burst = this).uri.toString())
         } else {
-            streamUrl?.let(Identity.Companion::stream) ?: audioUrl.let(Identity.Companion::stream)
+            streamUrl?.let(Identity.Companion::stream) ?: audioUrl.let(Identity.Companion::mp3)
         }
 
     private data class Identity(

@@ -12,12 +12,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
 
-internal class PlayerEventFlow(
+internal interface PlayerEventFlow {
+
+    operator fun invoke(): Flow<PlayerEvent>
+}
+
+internal class ExoPlayerEventsFlow(
     private val exoPlayer: ExoPlayer,
     private val appDispatchers: AppDispatchers,
-) {
+): PlayerEventFlow {
 
-    operator fun invoke(): Flow<PlayerEvent> =
+    override operator fun invoke(): Flow<PlayerEvent> =
         callbackFlow {
             val listener = object : Player.EventListener {
                 override fun onPositionDiscontinuity(reason: Int) {

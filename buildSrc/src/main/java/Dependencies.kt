@@ -38,11 +38,37 @@ object Dependencies {
         const val ui = "com.google.android.exoplayer:exoplayer-ui:$version"
         const val mediaSession = "com.google.android.exoplayer:extension-mediasession:$version"
         const val okHttp = "com.google.android.exoplayer:extension-okhttp:$version"
+        const val testUtil = "com.google.android.exoplayer:exoplayer-testutils:$version"
+        const val robolectricUtils = "com.google.android.exoplayer:exoplayer-robolectricutils:$version"
+    }
+
+    object OkHttp {
+        private const val version = "3.12.11"
+        val mockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
+    }
+
+    object Test {
+
+        object Junit {
+            private const val version = "4.13.2"
+            const val junit = "junit:junit:$version"
+        }
+
+        object Android {
+            private const val version = "1.2.0"
+            const val runner = "androidx.test:runner:$version"
+            const val core = "androidx.test:core:$version"
+            const val rules = "androidx.test:rules:$version"
+        }
     }
 }
 
 private fun DependencyHandler.implementation(dependency: String) {
     add("implementation", dependency)
+}
+
+fun DependencyHandler.androidTestImplementation(dependency: String) {
+    add("androidTestImplementation", dependency)
 }
 
 fun DependencyHandler.exoPlayerDependencies() {

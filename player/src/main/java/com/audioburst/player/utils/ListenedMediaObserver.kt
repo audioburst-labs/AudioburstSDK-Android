@@ -3,25 +3,30 @@ package com.audioburst.player.utils
 import com.audioburst.library.models.Duration
 import com.audioburst.library.models.DurationUnit
 import com.audioburst.library.models.toDuration
-import com.google.android.exoplayer2.analytics.AnalyticsCollector
-import com.google.android.exoplayer2.analytics.PlaybackStatsListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-internal class ListenedMediaObserver(
+internal interface ListenedMediaObserver {
+
+    var onListenedObserver: (() -> Unit)?
+
+    fun setMinimumListenedTimeForMedia(minimumListenedTimeForMedia: Duration?)
+
+    fun finish()
+}
+
+internal class TimeBasedListenedMediaObserver(
     scope: CoroutineScope,
     playingAwareTimerCreator: PlayingAwareTimer.Creator,
-    private val analyticsCollector: AnalyticsCollector,
-) {
+    private val mediaTotalPlayTimeProvider: MediaTotalPlayTimeProvider,
+) : ListenedMediaObserver {
 
-    var onListenedObserver: (() -> Unit)? = null
+    override var onListenedObserver: (() -> Unit)? = null
     private val playingAwareTimer = playingAwareTimerCreator.create(refreshInterval)
     private var minimumListenedTimeForMedia: Duration? = null
-    private val statsListener = PlaybackStatsListener(false, null)
 
     init {
-        analyticsCollector.addListener(statsListener)
         playingAwareTimer.timer
             .onEach { onTick() }
             .launchIn(scope)
@@ -29,19 +34,19 @@ internal class ListenedMediaObserver(
 
     private fun onTick() {
         val minimumListenedTimeMs = minimumListenedTimeForMedia?.milliseconds?.toLong() ?: return
-        val totalPlayTimeMs = statsListener.playbackStats?.totalPlayTimeMs ?: return
+        val totalPlayTimeMs = mediaTotalPlayTimeProvider.totalPlayTime.milliseconds
         if (totalPlayTimeMs >= minimumListenedTimeMs) {
             onListenedObserver?.invoke()
             minimumListenedTimeForMedia = null
         }
     }
 
-    fun setMinimumListenedTimeForMedia(minimumListenedTimeForMedia: Duration?) {
+    override fun setMinimumListenedTimeForMedia(minimumListenedTimeForMedia: Duration?) {
         this.minimumListenedTimeForMedia = minimumListenedTimeForMedia
     }
 
-    fun finish() {
-        analyticsCollector.removeListener(statsListener)
+    override fun finish() {
+        mediaTotalPlayTimeProvider.clear()
         onListenedObserver = null
     }
 

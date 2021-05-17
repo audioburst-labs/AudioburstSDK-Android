@@ -26,4 +26,6 @@ android {
 
 dependencies {
     implementation(Dependencies.Kotlin.stdlib)
+    implementation(Dependencies.Test.Junit.junit)
+    add("androidTestImplementation", Dependencies.Test.Android.runner)
 }

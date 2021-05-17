@@ -20,7 +20,7 @@ internal class AdUriResolver(
             runBlocking {
                 val currentPlaylist = currentPlaylistCache.currentPlaylist.value ?: throw UnsupportedUrlException(url)
                 val burst = currentPlaylist.bursts.firstOrNull { it.id == id } ?: throw UnsupportedUrlException(url)
-                val uri = getAdvertisementUrl(url, burst)
+                val uri = getAdvertisementUrl(burst)
                 dataSpec.withUri(Uri.parse(uri))
             }
         } else {

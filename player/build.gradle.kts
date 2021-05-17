@@ -6,7 +6,18 @@ plugins {
 
 val archiveName by extra(Constants.Library.playerArchiveName)
 
+android {
+    val sharedTestDir = "src/sharedTest/java"
+    sourceSets.getByName("test") {
+        java.srcDir(sharedTestDir)
+    }
+    sourceSets.getByName("androidTest") {
+        java.srcDir(sharedTestDir)
+    }
+}
+
 dependencies {
     exoPlayerDependencies()
     implementation(Dependencies.MobileLibrary.library)
+    testImplementation(Dependencies.OkHttp.mockWebServer)
 }

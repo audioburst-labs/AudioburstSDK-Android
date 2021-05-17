@@ -7,7 +7,7 @@ import com.audioburst.player.utils.AdUrlCache
 
 internal interface GetAdvertisementUrl {
 
-    suspend operator fun invoke(url: String, burst: Burst): String
+    suspend operator fun invoke(burst: Burst): String
 }
 
 internal class GetAdvertisementUrlInteractor(
@@ -15,7 +15,7 @@ internal class GetAdvertisementUrlInteractor(
     private val repository: Repository,
 ) : GetAdvertisementUrl {
 
-    override suspend fun invoke(url: String, burst: Burst): String =
+    override suspend fun invoke(burst: Burst): String =
         when (val result = repository.getAdUrl(burst)) {
             is Result.Data -> {
                 adUrlCache.set(burst, result.value)
