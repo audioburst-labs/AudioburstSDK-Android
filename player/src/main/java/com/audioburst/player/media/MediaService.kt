@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.*
 internal class MediaService : MediaBrowserServiceCompat() {
     lateinit var scope: CoroutineScope
     lateinit var exoPlayer: ExoPlayer
-    lateinit var burstPlayer: BurstPlayer
+    lateinit var burstPlayer: BurstExoPlayer
     lateinit var audioburstLibrary: AudioburstLibrary
     lateinit var mediaControllerCallback: MediaControllerCallback
 
@@ -59,7 +59,7 @@ internal class MediaService : MediaBrowserServiceCompat() {
     }
 
     private fun observePlayingState() {
-        burstPlayer.state
+        burstPlayer.playbackState
             .map { it.isPlaying }
             .debounce(timeoutMillis = 100)
             .distinctUntilChanged()
@@ -76,7 +76,7 @@ internal class MediaService : MediaBrowserServiceCompat() {
     private val playbackStateListener: PlaybackStateListener = PlaybackStateListener {
         burstPlayer.currentMediaUrl?.let { url ->
             PlaybackState(
-                positionMillis = burstPlayer.currentPlayBackPosition(),
+                positionMillis = burstPlayer.currentPlaybackPosition.milliseconds.toLong(),
                 url = url,
             )
         }

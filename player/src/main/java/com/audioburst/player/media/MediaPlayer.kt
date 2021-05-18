@@ -13,8 +13,6 @@ internal interface MediaPlayer {
 
     val state: StateFlow<PlaybackStateCompat>
 
-    val nowPlayingTags: StateFlow<List<String>>
-
     val isPlaying: StateFlow<Boolean>
 
     val playbackPosition: Long

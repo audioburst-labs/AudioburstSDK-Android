@@ -2,7 +2,9 @@ package com.audioburst.player.media
 
 import com.audioburst.library.models.DurationUnit
 import com.audioburst.library.models.toDuration
+import com.audioburst.player.models.AdState
 import com.audioburst.player.models.MediaUrl
+import com.audioburst.player.models.NowPlaying
 import com.audioburst.player.utils.ListenedMediaObserver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,9 +12,9 @@ import kotlinx.coroutines.flow.asStateFlow
 
 internal interface AdStateProvider {
 
-    val adState: StateFlow<BurstPlayer.AdState?>
+    val adState: StateFlow<AdState?>
 
-    fun onNowPlaying(nowPlaying: BurstPlayer.NowPlaying)
+    fun onNowPlaying(nowPlaying: NowPlaying)
 
     fun finish()
 }
@@ -21,10 +23,10 @@ internal class TimeAwareAdStateProvider(
     private val listenedMediaObserver: ListenedMediaObserver,
 ) : AdStateProvider {
 
-    private var currentMedia: BurstPlayer.NowPlaying.Media? = null
+    private var currentMedia: NowPlaying.Media? = null
 
-    private val _adState = MutableStateFlow<BurstPlayer.AdState?>(null)
-    override val adState: StateFlow<BurstPlayer.AdState?>
+    private val _adState = MutableStateFlow<AdState?>(null)
+    override val adState: StateFlow<AdState?>
         get() = _adState.asStateFlow()
 
     init {
@@ -35,23 +37,23 @@ internal class TimeAwareAdStateProvider(
         }
     }
 
-    override fun onNowPlaying(nowPlaying: BurstPlayer.NowPlaying) {
+    override fun onNowPlaying(nowPlaying: NowPlaying) {
         when (nowPlaying) {
-            is BurstPlayer.NowPlaying.Media -> onMedia(nowPlaying)
-            is BurstPlayer.NowPlaying.Nothing -> {
+            is NowPlaying.Media -> onMedia(nowPlaying)
+            is NowPlaying.Nothing -> {
                 _adState.value = null
                 currentMedia = null
             }
         }
     }
 
-    private fun onMedia(media: BurstPlayer.NowPlaying.Media) {
+    private fun onMedia(media: NowPlaying.Media) {
         if (currentMedia?.burst == media.burst && currentMedia?.mediaUrl == media.mediaUrl) {
             return
         }
         currentMedia = media
         val minimumListenedTimeForMedia = if (media.mediaUrl is MediaUrl.Advertisement) minimumAdListenTime else null
-        _adState.value = BurstPlayer.AdState(isAvailableInCurrentMedia = minimumListenedTimeForMedia != null)
+        _adState.value = AdState(isAvailableInCurrentMedia = minimumListenedTimeForMedia != null)
         listenedMediaObserver.setMinimumListenedTimeForMedia(minimumListenedTimeForMedia)
     }
 

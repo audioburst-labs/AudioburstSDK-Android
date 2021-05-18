@@ -3,21 +3,18 @@ package com.audioburst.player.media
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.audioburst.library.models.Burst
-import com.audioburst.library.models.Playlist
+import com.audioburst.library.models.*
 import com.audioburst.player.extensions.*
-import com.audioburst.player.extensions.isPrepared
 import com.audioburst.player.media.events.PlayerEvent
 import com.audioburst.player.media.events.PlayerEventFlow
 import com.audioburst.player.media.mappers.BurstToMediaItemMapper
-import com.audioburst.player.models.BurstIdUri
-import com.audioburst.player.models.MediaUrl
+import com.audioburst.player.models.*
+import com.audioburst.player.models.PlaybackState
 import com.audioburst.player.utils.AdUrlCache
 import com.audioburst.player.utils.CurrentPlaylistCacheSetter
-import com.google.android.exoplayer2.MediaItem
+import com.audioburst.player.utils.PlaybackTimer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 internal class BurstExoPlayer(
     playerEventFlow: PlayerEventFlow,
@@ -27,30 +24,34 @@ internal class BurstExoPlayer(
     private val adStateProvider: AdStateProvider,
     private val currentPlaylistCacheSetter: CurrentPlaylistCacheSetter,
     private val adUrlCache: AdUrlCache,
+    private val playbackTimerCreator: PlaybackTimer.Creator,
 ) : BurstPlayer {
 
     private val _state = MutableStateFlow(mediaPlayer.state.value.toState(mediaPlayer.isPlaying.value))
-    override val state: StateFlow<BurstPlayer.State>
+    override val playbackState: StateFlow<PlaybackState>
         get() = _state
 
-    private val _nowPlaying = MutableStateFlow<BurstPlayer.NowPlaying>(BurstPlayer.NowPlaying.Nothing())
-    override val nowPlaying: StateFlow<BurstPlayer.NowPlaying>
+    private val _nowPlaying = MutableStateFlow<NowPlaying>(NowPlaying.Nothing())
+    override val nowPlaying: StateFlow<NowPlaying>
         get() = _nowPlaying
 
     private val _currentPlaylist = MutableStateFlow<Playlist?>(null)
     override val currentPlaylist: StateFlow<Playlist?>
         get() = _currentPlaylist
 
-    override val adState: StateFlow<BurstPlayer.AdState?>
+    override val adState: StateFlow<AdState?>
         get() = adStateProvider.adState
 
     override val currentMediaUrl: String?
-        get() = (_nowPlaying.value as? BurstPlayer.NowPlaying.Media)?.mediaUrl?.url
+        get() = (_nowPlaying.value as? NowPlaying.Media)?.mediaUrl?.url
 
-    override val currentMediaDuration: Long?
-        get() = (_nowPlaying.value as? BurstPlayer.NowPlaying.Media)?.duration
+    override val currentMediaDuration: Duration?
+        get() = (_nowPlaying.value as? NowPlaying.Media)?.duration
 
-    override var shouldPrefetch: Boolean = false
+    override val currentPlaybackPosition: Duration
+        get() = mediaPlayer.playbackPosition.toDouble().toDuration(DurationUnit.Milliseconds)
+
+    private var shouldPrefetch: Boolean = false
 
     init {
         mediaPlayer.state
@@ -76,9 +77,9 @@ internal class BurstExoPlayer(
             .onEach {
                 val url = it.url
                 val nowPlaying = _nowPlaying.value
-                if (nowPlaying is BurstPlayer.NowPlaying.Media && nowPlaying.burst.contains(url)) {
-                    _nowPlaying.value = BurstPlayer.NowPlaying.Nothing(
-                        BurstPlayer.NowPlaying.Nothing.Reason.UnsupportedUrl(
+                if (nowPlaying is NowPlaying.Media && nowPlaying.burst.contains(url)) {
+                    _nowPlaying.value = NowPlaying.Nothing(
+                        NowPlaying.Nothing.Reason.UnsupportedUrl(
                             burst = nowPlaying.burst,
                             url = url,
                         )
@@ -91,32 +92,31 @@ internal class BurstExoPlayer(
     private fun Burst.contains(url: String): Boolean =
         url == audioUrl || url == streamUrl || url == source.audioUrl
 
-    override fun play(playlist: Playlist) {
-        prepareAndPlay(bursts = playlist.bursts)
-        onNewPlaylist(playlist)
+    override fun load(playlist: Playlist, playWhenReady: Boolean) {
+        if (playlist.bursts.isNotEmpty()) {
+            prepareAndPlay(
+                playlist = playlist,
+                playWhenReady = playWhenReady,
+            )
+            onNewPlaylist(playlist)
+        }
     }
 
     private fun onNewPlaylist(playlist: Playlist) {
         _currentPlaylist.value = playlist
         currentPlaylistCacheSetter.setCurrentPlaylist(playlist)
-        adUrlCache.clear()
-    }
-
-    private fun prepareAndPlay(bursts: List<Burst>, idToPlay: String? = null, playWhenReady: Boolean = true) {
-        scope.launch {
-            if (bursts.isEmpty()) return@launch
-            pause()
-            prepareAndPlay(
-                id = idToPlay ?: bursts.first().id,
-                playWhenReady = playWhenReady,
-                mediaItems = bursts.map(burstToMediaItemMapper::map),
-            )
+        if (currentPlaylist.value?.id != playlist.id) {
+            adUrlCache.clear()
         }
     }
 
-    private fun prepareAndPlay(id: String, mediaItems: List<MediaItem>, playWhenReady: Boolean) {
-        val nowPlayingId = (nowPlaying.value as? BurstPlayer.NowPlaying.Media)?.burst?.id
-        if (state.value.isPrepared && id == nowPlayingId) {
+    private fun prepareAndPlay(playlist: Playlist, idToPlay: String? = null, playWhenReady: Boolean = true) {
+        val mediaItems = playlist.bursts.map(burstToMediaItemMapper::map)
+        if (currentPlaylist.value?.id == playlist.id) {
+            mediaPlayer.addAll(
+                list = mediaItems,
+                shouldUseCache = shouldPrefetch,
+            )
             if (playWhenReady) {
                 play()
             }
@@ -125,38 +125,31 @@ internal class BurstExoPlayer(
                 list = mediaItems,
                 shouldUseCache = shouldPrefetch,
                 playWhenReady = playWhenReady,
-                mediaId = id
+                mediaId = idToPlay ?: mediaItems.first().mediaId,
             )
-            if (playWhenReady) {
-                play()
-            }
         }
     }
 
-    override fun removeAt(position: Int): Burst? {
-        val burst = currentPlaylist.value?.bursts?.getOrNull(position)
-        val isSuccess = mediaPlayer.removeAt(position)
-        return if (isSuccess && burst != null) {
-            burst
-        } else {
-            null
-        }
-    }
-
-    override fun playSource(burst: Burst) {
-        scope.launch {
-            val mediaItem = burstToMediaItemMapper.mapWithSource(burst) ?: return@launch
-            val seekTo = mediaPlayer.playbackPosition + burst.source.durationFromStart.milliseconds.toLong()
-            val position = mediaPlayer.currentTimeline.indexOf(burst.id)
+    override fun switchToBurstSource(burst: Burst): Boolean {
+        val mediaItem = burstToMediaItemMapper.mapWithSource(burst) ?: return false
+        val seekTo = mediaPlayer.playbackPosition + burst.source.durationFromStart.milliseconds.toLong()
+        val position = mediaPlayer.currentTimeline.indexOf(burst.id)
+        return if (position != -1) {
             mediaPlayer.replaceAt(mediaItem, position, seekTo)
+            true
+        } else {
+            false
         }
     }
 
-    override fun play(burst: Burst) {
-        scope.launch {
-            val position = mediaPlayer.currentTimeline.indexOf(burst.id)
-            val mediaItem = burstToMediaItemMapper.map(burst)
+    override fun switchToBurst(burst: Burst): Boolean {
+        val position = mediaPlayer.currentTimeline.indexOf(burst.id)
+        val mediaItem = burstToMediaItemMapper.map(burst)
+        return if (position != -1) {
             mediaPlayer.replaceAt(mediaItem, position, 0L)
+            true
+        } else {
+            false
         }
     }
 
@@ -165,64 +158,68 @@ internal class BurstExoPlayer(
         mediaPlayer.prepareOnIdle()
     }
 
-    override fun playAt(position: Int) {
-        mediaPlayer.playAt(position)
-        mediaPlayer.prepareOnIdle()
-    }
+    override fun playAt(position: Int): Boolean =
+        if (mediaPlayer.currentTimeline.elementAtOrNull(position) != null) {
+            mediaPlayer.playAt(position)
+            mediaPlayer.prepareOnIdle()
+            true
+        } else {
+            false
+        }
 
     override fun pause() {
         mediaPlayer.pause()
     }
 
     override fun togglePlayback() {
-        val state = state.value
+        val state = playbackState.value
         when {
             state.isPlaying -> pause()
             state.isPlayEnabled -> play()
         }
     }
 
-    override fun next() {
-        if (state.value.isSkipToNextEnabled) {
+    override fun next(): Boolean =
+        if (playbackState.value.isSkipToNextEnabled) {
             mediaPlayer.skipToNext()
             mediaPlayer.prepareOnIdle()
-        }
-    }
-
-    override fun previous() {
-        if (state.value.isSkipToPreviousEnabled) {
-            mediaPlayer.skipToPrevious()
+            true
         } else {
-            seekTo(0)
+            false
         }
-        mediaPlayer.prepareOnIdle()
+
+    override fun previous(): Boolean =
+        if (playbackState.value.isSkipToPreviousEnabled) {
+            mediaPlayer.skipToPrevious()
+            mediaPlayer.prepareOnIdle()
+            true
+        } else {
+            false
+        }
+
+    override fun seekTo(position: Duration) {
+        mediaPlayer.seekTo(position.milliseconds.toLong())
     }
 
-    override fun seekTo(position: Long) {
-        mediaPlayer.seekTo(position)
-    }
+    override fun playbackTime(updateInterval: Duration): StateFlow<PlaybackTime> =
+        playbackTimerCreator.create(updateInterval).playbackTime
 
-    override fun currentPlayBackPosition(): Long = mediaPlayer.playbackPosition
-
-    override fun clear() {
+    internal fun clear() {
         mediaPlayer.stopPlayback()
         adStateProvider.finish()
     }
 }
 
-private inline val MediaMetadataCompat.duration: Long
-    get() = this.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
-
-private fun MediaMetadataCompat.toNowPlaying(currentBursts: List<Burst>, adUrlCache: AdUrlCache): BurstPlayer.NowPlaying {
-    if (this == NOTHING_PLAYING) return BurstPlayer.NowPlaying.Nothing()
-    val id = description.mediaId ?: return BurstPlayer.NowPlaying.Nothing()
+private fun MediaMetadataCompat.toNowPlaying(currentBursts: List<Burst>, adUrlCache: AdUrlCache): NowPlaying {
+    if (this == NOTHING_PLAYING) return NowPlaying.Nothing()
+    val id = description.mediaId ?: return NowPlaying.Nothing()
     val duration = duration
-    val uri = description.mediaUri ?: return BurstPlayer.NowPlaying.Nothing()
-    val burst = currentBursts.firstOrNull { it.id == id } ?: return BurstPlayer.NowPlaying.Nothing()
-    val mediaUrl = uri.toMediaUrl(burst, adUrlCache.get(burst)) ?: return BurstPlayer.NowPlaying.Nothing()
-    return BurstPlayer.NowPlaying.Media(
+    val uri = description.mediaUri ?: return NowPlaying.Nothing()
+    val burst = currentBursts.firstOrNull { it.id == id } ?: return NowPlaying.Nothing()
+    val mediaUrl = uri.toMediaUrl(burst, adUrlCache.get(burst)) ?: return NowPlaying.Nothing()
+    return NowPlaying.Media(
         burst = burst,
-        duration = duration,
+        duration = duration.toDouble().toDuration(DurationUnit.Milliseconds),
         positionInPlaylist = currentBursts.indexOf(burst),
         mediaUrl = mediaUrl,
     )
@@ -240,8 +237,8 @@ private fun Uri.toMediaUrl(burst: Burst, adUrl: String?): MediaUrl? =
         else -> null
     }
 
-private fun PlaybackStateCompat.toState(isPlaying: Boolean): BurstPlayer.State =
-    BurstPlayer.State(
+private fun PlaybackStateCompat.toState(isPlaying: Boolean): PlaybackState =
+    PlaybackState(
         isPlaying = isPlaying,
         isPrepared = isPrepared,
         isPauseEnabled = isPauseEnabled,

@@ -3,7 +3,7 @@ package com.audioburst.player.di
 import android.content.ComponentName
 import android.content.Context
 import android.support.v4.media.MediaBrowserCompat
-import com.audioburst.player.data.Repository
+import com.audioburst.player.data.AdUrlRepository
 import com.audioburst.player.di.provider.Provider
 import com.audioburst.player.di.provider.provider
 import com.audioburst.player.di.provider.singleton
@@ -29,7 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 
 internal class MediaModule(
     context: Context,
-    repositoryProvider: Provider<Repository>,
+    adUrlRepositoryProvider: Provider<AdUrlRepository>,
     libraryScopeProvider: Provider<CoroutineScope>,
     appDispatchersProvider: Provider<AppDispatchers>,
 ) {
@@ -58,7 +58,7 @@ internal class MediaModule(
     private val getAdvertisementUrlProvider: Provider<GetAdvertisementUrl> = provider {
         GetAdvertisementUrlInteractor(
             adUrlCache = adUrlCacheProvider.get(),
-            repository = repositoryProvider.get(),
+            adUrlRepository = adUrlRepositoryProvider.get(),
         )
     }
     private val playerEventFlowProvider: Provider<PlayerEventFlow> = provider {
@@ -104,10 +104,18 @@ internal class MediaModule(
     private val inMemoryCurrentPlaylistCacheProvider: Provider<InMemoryCurrentPlaylistCache> = singleton { InMemoryCurrentPlaylistCache() }
     private val currentPlaylistCacheProvider: Provider<CurrentPlaylistCache> = provider { inMemoryCurrentPlaylistCacheProvider.get() }
     private val currentPlaylistCacheSetterProvider: Provider<CurrentPlaylistCacheSetter> = provider { inMemoryCurrentPlaylistCacheProvider.get() }
+    private val playbackTimerCreatorProvider: Provider<PlaybackTimer.Creator> = provider {
+        PlaybackTimer.Creator(
+            scope = libraryScopeProvider.get(),
+            playingAwareTimerCreator = playingAwareTimerCreatorProvider.get(),
+            mediaPlayer = mediaPlayerProvider.get(),
+        )
+    }
     val mediaControllerCallbackProvider: Provider<MediaControllerCallback> = singleton {
         MediaControllerCallback(mediaBrowserConnectionCallbackProvider.get())
     }
-    val burstPlayerProvider: Provider<BurstPlayer> = singleton {
+    val burstPlayerProvider: Provider<BurstPlayer> = singleton { burstExoPlayerProvider.get() }
+    val burstExoPlayerProvider: Provider<BurstExoPlayer> = singleton {
         BurstExoPlayer(
             playerEventFlow = playerEventFlowProvider.get(),
             scope = libraryScopeProvider.get(),
@@ -116,6 +124,7 @@ internal class MediaModule(
             adStateProvider = adStateProviderProvider.get(),
             currentPlaylistCacheSetter = currentPlaylistCacheSetterProvider.get(),
             adUrlCache = adUrlCacheProvider.get(),
+            playbackTimerCreator = playbackTimerCreatorProvider.get(),
         )
     }
     val mediaSessionConnectionProvider: Provider<MediaSessionConnection> = singleton {

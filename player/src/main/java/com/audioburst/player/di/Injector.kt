@@ -2,9 +2,9 @@ package com.audioburst.player.di
 
 import android.content.Context
 import com.audioburst.library.AudioburstLibrary
-import com.audioburst.player.Player
+import com.audioburst.player.AudioburstPlayerCore
+import com.audioburst.player.data.AdUrlRepository
 import com.audioburst.player.data.AudioburstLibraryRepository
-import com.audioburst.player.data.Repository
 import com.audioburst.player.di.provider.Provider
 import com.audioburst.player.di.provider.provider
 import com.audioburst.player.di.provider.singleton
@@ -24,7 +24,7 @@ internal object Injector {
             context = applicationContext,
             libraryScopeProvider = libraryScopeProvider,
             appDispatchersProvider = appDispatchersProvider,
-            repositoryProvider = repositoryProvider,
+            adUrlRepositoryProvider = adUrlRepositoryProvider,
         )
     }
     private val libraryScopeProvider: Provider<CoroutineScope> = singleton {
@@ -39,7 +39,7 @@ internal object Injector {
     private val audioburstLibraryProvider: Provider<AudioburstLibrary> = provider {
         AudioburstLibrary(applicationKey = applicationKey)
     }
-    private val repositoryProvider: Provider<Repository> = provider {
+    private val adUrlRepositoryProvider: Provider<AdUrlRepository> = provider {
         AudioburstLibraryRepository(
             audioburstLibrary = audioburstLibraryProvider.get(),
         )
@@ -54,16 +54,17 @@ internal object Injector {
         mediaService.apply {
             scope = libraryScopeProvider.get()
             exoPlayer = mediaModule.exoPlayerProvider.get()
-            burstPlayer = mediaModule.burstPlayerProvider.get()
+            burstPlayer = mediaModule.burstExoPlayerProvider.get()
             audioburstLibrary = audioburstLibraryProvider.get()
             mediaControllerCallback = mediaModule.mediaControllerCallbackProvider.get()
         }
     }
 
-    fun inject(player: Player) {
+    fun inject(player: AudioburstPlayerCore) {
         player.apply {
             mediaSessionConnection = mediaModule.mediaSessionConnectionProvider.get()
-            burstPlayer = mediaModule.burstPlayerProvider.get()
+            _audioburstLibrary = audioburstLibraryProvider.get()
+            _burstPlayer = mediaModule.burstPlayerProvider.get()
         }
     }
 }

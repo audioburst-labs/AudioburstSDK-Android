@@ -2,7 +2,11 @@ package com.audioburst.player.media
 
 import com.audioburst.library.models.Burst
 import com.audioburst.library.models.Duration
+import com.audioburst.library.models.DurationUnit
+import com.audioburst.library.models.toDuration
+import com.audioburst.player.models.AdState
 import com.audioburst.player.models.MediaUrl
+import com.audioburst.player.models.NowPlaying
 import com.audioburst.player.models.burstOf
 import com.audioburst.player.utils.ListenedMediaObserver
 import org.junit.Test
@@ -22,7 +26,7 @@ internal class AdStateProviderTest {
     @Test
     fun `test if there is null emitted when current NowPlaying is Nothing`() {
         // GIVEN
-        val nowPlaying = BurstPlayer.NowPlaying.Nothing()
+        val nowPlaying = NowPlaying.Nothing()
 
         // WHEN
         val adStateProvider = timeAwareAdStateProviderOf(listenedMediaObserverOf())
@@ -42,7 +46,7 @@ internal class AdStateProviderTest {
         adStateProvider.onNowPlaying(nowPlaying)
 
         // THEN
-        assert(adStateProvider.adState.value == BurstPlayer.AdState(isAvailableInCurrentMedia = false))
+        assert(adStateProvider.adState.value == AdState(isAvailableInCurrentMedia = false))
     }
 
     @Test
@@ -55,7 +59,7 @@ internal class AdStateProviderTest {
         adStateProvider.onNowPlaying(nowPlaying)
 
         // THEN
-        assert(adStateProvider.adState.value == BurstPlayer.AdState(isAvailableInCurrentMedia = false))
+        assert(adStateProvider.adState.value == AdState(isAvailableInCurrentMedia = false))
     }
 
     @Test
@@ -68,7 +72,7 @@ internal class AdStateProviderTest {
         adStateProvider.onNowPlaying(nowPlaying)
 
         // THEN
-        assert(adStateProvider.adState.value == BurstPlayer.AdState(isAvailableInCurrentMedia = true, canSkip = false))
+        assert(adStateProvider.adState.value == AdState(isAvailableInCurrentMedia = true, canSkip = false))
     }
 
     @Test
@@ -83,7 +87,7 @@ internal class AdStateProviderTest {
         listenedMediaObserver.onListenedObserver?.invoke()
 
         // THEN
-        assert(adStateProvider.adState.value == BurstPlayer.AdState(isAvailableInCurrentMedia = true, canSkip = true))
+        assert(adStateProvider.adState.value == AdState(isAvailableInCurrentMedia = true, canSkip = true))
     }
 }
 
@@ -92,12 +96,12 @@ internal fun mediaOf(
     mediaUrl: MediaUrl = MediaUrl.Burst(""),
     positionInPlaylist: Int = 0,
     duration: Long = 0L,
-): BurstPlayer.NowPlaying.Media =
-    BurstPlayer.NowPlaying.Media(
+): NowPlaying.Media =
+    NowPlaying.Media(
         burst = burst,
         mediaUrl = mediaUrl,
         positionInPlaylist = positionInPlaylist,
-        duration = duration,
+        duration = duration.toDouble().toDuration(DurationUnit.Milliseconds),
     )
 
 internal fun timeAwareAdStateProviderOf(listenedMediaObserver: ListenedMediaObserver): TimeAwareAdStateProvider =

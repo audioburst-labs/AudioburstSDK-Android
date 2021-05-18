@@ -31,12 +31,6 @@ internal class ExoMediaPlayer(
     override val state: StateFlow<PlaybackStateCompat>
         get() = mediaControllerCallback.playbackState
 
-    override val nowPlayingTags: StateFlow<List<String>>
-        get() = playerEventFlow()
-            .filterIsInstance<PlayerEvent.TimelineChanged>()
-            .map { it.timeline }
-            .stateIn(scope, SharingStarted.WhileSubscribed(), emptyList())
-
     override val isPlaying: StateFlow<Boolean>
         get() = playerEventFlow()
             .filterIsInstance<PlayerEvent.IsPlayingChanged>()
@@ -147,6 +141,9 @@ internal class ExoMediaPlayer(
     override fun prepareOnIdle() {
         if (exoPlayer.playbackState == ExoPlayer.STATE_IDLE) {
             exoPlayer.prepare()
+        }
+        if (exoPlayer.playbackState == ExoPlayer.STATE_ENDED) {
+            exoPlayer.seekTo(0)
         }
     }
 

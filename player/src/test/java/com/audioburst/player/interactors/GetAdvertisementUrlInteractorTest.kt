@@ -2,7 +2,7 @@ package com.audioburst.player.interactors
 
 import com.audioburst.library.models.LibraryError
 import com.audioburst.library.models.Result
-import com.audioburst.player.data.Repository
+import com.audioburst.player.data.AdUrlRepository
 import com.audioburst.player.data.repositoryOf
 import com.audioburst.player.models.burstOf
 import com.audioburst.player.utils.AdUrlCache
@@ -17,7 +17,7 @@ internal class GetAdvertisementUrlInteractorTest {
         adUrlCache: AdUrlCache,
     ): GetAdvertisementUrlInteractor =
         getAdvertisementUrlInteractorOf(
-            repository = repositoryOf(getAdUrl = getAdUrlReturns),
+            adUrlRepository = repositoryOf(getAdUrl = getAdUrlReturns),
             adUrlCache = adUrlCache,
         )
 
@@ -56,9 +56,9 @@ internal class GetAdvertisementUrlInteractorTest {
 
 internal fun getAdvertisementUrlInteractorOf(
     adUrlCache: AdUrlCache,
-    repository: Repository,
+    adUrlRepository: AdUrlRepository,
 ): GetAdvertisementUrlInteractor =
     GetAdvertisementUrlInteractor(
         adUrlCache = adUrlCache,
-        repository = repository,
+        adUrlRepository = adUrlRepository,
     )

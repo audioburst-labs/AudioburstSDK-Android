@@ -1,5 +1,9 @@
 package com.audioburst.player.models
 
+/**
+ * Class used to describe what content is currently playing, whether it is Burst's content or Burst's source content
+ * or an advertisement.
+ */
 public sealed class MediaUrl {
     public abstract val url: String
 
