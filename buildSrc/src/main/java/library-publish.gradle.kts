@@ -19,6 +19,7 @@ afterEvaluate {
                 val libraryVersion = Constants.Library.version
                 val projectGroup = Constants.Library.packageName
                 val archiveName: String by extra
+                val projectDescription: String by extra
 
                 groupId = projectGroup
                 artifactId = archiveName
@@ -29,7 +30,7 @@ afterEvaluate {
 
                 pom {
                     name.set(artifactId)
-                    description.set("AudioburstSDK-Android is a multi platform library that allows convenient access to the Audioburst’s Content APIs.")
+                    description.set(projectDescription)
                     url.set("https://github.com/audioburst-labs/AudioburstSDK-Android")
                     licenses {
                         license {

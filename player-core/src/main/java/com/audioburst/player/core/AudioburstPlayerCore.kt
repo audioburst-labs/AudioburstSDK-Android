@@ -165,7 +165,7 @@ public object AudioburstPlayerCore {
         burstPlayer.next()
 
     /**
-     * Trying to move to the previous [Burst]. If there is no previous [Burst] it will rewind.
+     * Trying to move to the previous [Burst].
      *
      * @return Whether it was possible to move to previous.
      */

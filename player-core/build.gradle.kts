@@ -4,7 +4,8 @@ plugins {
     id(Dependencies.Plugins.explicitApiMode)
 }
 
-val archiveName by extra(Constants.Library.playerArchiveName)
+val archiveName by extra(Constants.Library.Core.archiveName)
+val projectDescription by extra(Constants.Library.Core.projectDescription)
 
 android {
     val sharedTestDir = "src/sharedTest/java"
