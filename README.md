@@ -1,11 +1,11 @@
 # AudioburstSDK-Android
 
 ## Introduction
-AudioburstSDK is the SDK for Android that lets you build applications with Audioburst features. It will let you play a pre-arranged playlist of audio items - or `bursts` - short snippets of spoken-word audio sourced from live radio and premium podcasts.
+AudioburstSDK is the SDK for Android that lets you build applications with Audioburst features. It allows you to play a pre-arranged playlist of audio items - or `bursts` - short snippets of spoken-word audio sourced from live radio and premium podcasts.
 
 ## Features
-AudioburstSDK offers a following modules:
-- [`player-core`][player-core] - library that will let you access Audioburst content and add playback functionality to your app.
+AudioburstSDK offers the following modules:
+- [`player-core`][player-core] - A library that allows you to access Audioburst content and add playback functionality to your app.
 
 ## Prerequisites
 

@@ -24,7 +24,7 @@ public object AudioburstPlayerCore {
 
     internal var _burstPlayer: BurstPlayer? = null
     /**
-     * Obtain this object to better control playback
+     * Obtain this object to better control playback, observe its state and much more.
      */
     public val burstPlayer: BurstPlayer
         get() = if (_burstPlayer == null) {
@@ -35,7 +35,7 @@ public object AudioburstPlayerCore {
 
     internal var _audioburstLibrary: AudioburstLibrary? = null
     /**
-     * Obtain this object to better control playback
+     * Use [AudioburstLibrary] to request Audioburst content.
      */
     public val audioburstLibrary: AudioburstLibrary
         get() = if (_audioburstLibrary == null) {

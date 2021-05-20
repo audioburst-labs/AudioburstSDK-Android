@@ -1,5 +1,5 @@
 # AudioburstSDK core library module
-Library that will let you access Audioburst content and add playback functionality to your app.
+A library that allows you to access Audioburst content and add playback functionality to your app.
 
 ## Get Started
 
@@ -56,7 +56,7 @@ AudioburstPlayerCore.setAudioburstUserID("EXISTING_AUDIOBURST_API_USER_ID")
 All the functions below are `suspending`, which means that you need to call them using a `CoroutineScope`.
 Additionally, they return the `Result` object which can be either `Data` or `Error`.
 
-The library is built on top of our other library - [AudioburstMobileLibrary](https://github.com/audioburst-labs/AudioburstMobileLibrary). Some data structures used in this library are also exposed by `player-core`, so if you are looking for a documentation of those you can check here: [wiki page](https://github.com/audioburst-labs/AudioburstMobileLibrary/wiki)
+The `AudioburstSDK` library is built on top of the `AudioburstMobileLibrary` library - [AudioburstMobileLibrary](https://github.com/audioburst-labs/AudioburstMobileLibrary). Some data structures used in this library are also exposed by `player-core`. Documentation for these can be found here: [wiki page](https://github.com/audioburst-labs/AudioburstMobileLibrary/wiki)
 
 The library offers a few handy extension functions that make it easier to work with this type. Check the [Result](https://github.com/audioburst-labs/AudioburstMobileLibrary/blob/master/src/commonMain/kotlin/com/audioburst/library/models/Result.kt) class to learn more about it.
 
@@ -151,18 +151,18 @@ AudioburstPlayerCore.load(
 
 ## Control playback
 `AudioburstPlayerCore` exposes a set of simple methods that will let you control playback state:
-- `play` - trying to start playback if there is any `Playlist` ready,
+- `play` - starts playback if a `Playlist` is ready,
 - `pause` - pauses playback,
-- `next` - trying to move to the next `Burst`. Returns whether it was possible to move to next.
-- `previous` - trying to move to the previous `Burst`. Returns whether it was possible to move to previous.
+- `next` - moves to the next `Burst` when possible.
+- `previous` - moves to the previous `Burst` when possible.
 
 ## Use `BurstPlayer`
-If you need to observe a playback state and control it in a more sophisticated way there is a `BurstPlayer` interface that will let you do it. You can obtain it in a following way:
+The `BurstPlayer` interface notifies every time the playback state changes. For example, it sends information that a user clicked the Play button, or information about the content that is playing. It can be obtained the following way:
 ```kotlin
 val burstPlayer = AudioburstPlayerCore.burstPlayer
 ```
 
-[BurstPlayer][BurstPlayer] exposes an ability to subscribe to update about [PlaybackState][PlaybackState], [NowPlaying][NowPlaying], [AdState][AdState] and [PlaybackTime][PlaybackTime]. It also gives you a possibility to control a playback via functions like the ones described above, but also use some methods to for example switch from playing `Burst` content to `BurstSource` content and much more.
+[BurstPlayer][BurstPlayer] exposes an ability to subscribe to updates about [PlaybackState][PlaybackState], [NowPlaying][NowPlaying], [AdState][AdState] and [PlaybackTime][PlaybackTime]. It also provides the ability to control playback via functions like the ones described above. It also uses methods like, for example, to switch from playing `Burst` content to `BurstSource` content and much more.
 
 You can learn more about features of this class [here][BurstPlayer].
 
