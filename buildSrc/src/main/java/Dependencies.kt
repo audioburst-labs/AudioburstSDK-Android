@@ -7,7 +7,7 @@ object Constants {
     object Library {
         const val packageName = "com.audioburst"
         const val version = projectVersion
-        const val playerArchiveName = "player"
+        const val playerArchiveName = "player-core"
     }
 }
 
