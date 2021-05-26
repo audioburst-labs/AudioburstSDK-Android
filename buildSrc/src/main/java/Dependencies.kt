@@ -2,7 +2,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 
 object Constants {
     const val projectName = "AudioburstSDK-Android"
-    const val projectVersion = "0.0.1"
+    const val projectVersion = "0.0.2"
 
     object Library {
         const val packageName = "com.audioburst"
@@ -10,7 +10,7 @@ object Constants {
 
         object Core {
             const val archiveName = "player-core"
-            const val projectDescription = "Library that will let you access Audioburst content and add playback functionality to your app."
+            const val projectDescription = "AudioburstSDK is the SDK for Android that lets you access Audioburst content and add playback functionality to your app."
         }
     }
 }
