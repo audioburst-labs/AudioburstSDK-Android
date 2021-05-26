@@ -4,7 +4,10 @@ import com.audioburst.library.models.Duration
 import com.audioburst.player.core.media.events.PlayerEvent
 import com.audioburst.player.core.media.events.PlayerEventFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 internal class PlayingAwareTimer private constructor(
     interval: Duration,
@@ -18,7 +21,6 @@ internal class PlayingAwareTimer private constructor(
     init {
         playerEventFlow()
             .filterIsInstance<PlayerEvent.IsPlayingChanged>()
-            .debounce(timeoutMillis = 200)
             .onEach {
                 if (it.isPlaying) {
                     periodicTimer.start()
