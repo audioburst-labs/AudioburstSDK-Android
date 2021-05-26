@@ -31,7 +31,7 @@ object Dependencies {
     }
 
     object MobileLibrary {
-        private const val version = "0.0.20"
+        private const val version = "0.0.21"
         const val library = "com.audioburst:mobile-library:$version"
     }
 

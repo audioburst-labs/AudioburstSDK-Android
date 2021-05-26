@@ -97,6 +97,18 @@ AudioburstPlayerCore.getPlaylist(byteArray)
 
 The `getPlaylist` function accepts `ByteArray` as an argument. A request included in the PCM file will be processed and a playlist of the bursts will be returned.
 
+## Search for a query
+The Library exposes an ability to search for a text query. The response will either be a `Playlist` with the list of `Bursts` found OR a `NoSearchResults` error.
+```kotlin
+AudioburstPlayerCore.search(query)
+    .onData { playlist ->
+        // Build your playback queue by using list of Bursts
+    }
+    .onError { error ->
+        // Handle error
+    }
+```
+
 ## Get Personalized Playlist using async
 The library includes the capability to get a personalized playlist constructed according to a user’s preferences. In order to shorten the loading time of the personalized playlist, the library exposes the ability to "subscribe" to ongoing changes in the playlist. Subscribing enables notifications every time new `Burst`s are added to the playlist and the ability to check if the playlist is ready.
 

@@ -100,6 +100,16 @@ public object AudioburstPlayerCore {
         audioburstLibrary.getPlaylist(byteArray)
 
     /**
+     * You can use this function to pass search query and search for [Burst]s.
+     *
+     * Returns [Result.Data] when it was possible to get requested resource. When the API returned an empty list of [Burst]s
+     * you will get [LibraryError.NoSearchResults]. In case there was a problem getting it [Result.Error] will be returned
+     * with a proper error ([LibraryError]).
+     */
+    public suspend fun search(query: String): Result<Playlist> =
+        audioburstLibrary.search(query)
+
+    /**
      * If you already have users in your app and you wouldn't like to register new one, you can use this function to
      * inform library what ABUserId it should use to communicate to the API. This function will return true if the given
      * ABUserId is correct and present in Audioburst database. Otherwise it will return false.
