@@ -5,15 +5,10 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.audioburst.library.models.*
 import com.audioburst.player.core.extensions.*
-import com.audioburst.player.core.extensions.duration
-import com.audioburst.player.core.extensions.isPauseEnabled
-import com.audioburst.player.core.extensions.isPlayEnabled
-import com.audioburst.player.core.extensions.isPrepared
 import com.audioburst.player.core.media.events.PlayerEvent
 import com.audioburst.player.core.media.events.PlayerEventFlow
 import com.audioburst.player.core.media.mappers.BurstToMediaItemMapper
 import com.audioburst.player.core.models.*
-import com.audioburst.player.core.models.BurstIdUri
 import com.audioburst.player.core.models.PlaybackState
 import com.audioburst.player.core.utils.AdUrlCache
 import com.audioburst.player.core.utils.CurrentPlaylistCacheSetter
@@ -212,6 +207,9 @@ internal class BurstExoPlayer(
     internal fun clear() {
         mediaPlayer.stopPlayback()
         adStateProvider.finish()
+        _state.value = PlaybackState()
+        _nowPlaying.value = NowPlaying.Nothing()
+        _currentPlaylist.value = null
     }
 }
 

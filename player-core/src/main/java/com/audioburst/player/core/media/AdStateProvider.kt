@@ -59,6 +59,7 @@ internal class TimeAwareAdStateProvider(
 
     override fun finish() {
         listenedMediaObserver.finish()
+        _adState.value = null
     }
 
     companion object {

@@ -26,6 +26,7 @@ public object AudioburstPlayerCore {
     /**
      * Obtain this object to better control playback, observe its state and much more.
      */
+    @JvmStatic
     public val burstPlayer: BurstPlayer
         get() = if (_burstPlayer == null) {
             error(ERROR_MESSAGE)
@@ -37,12 +38,24 @@ public object AudioburstPlayerCore {
     /**
      * Use [AudioburstLibrary] to request Audioburst content.
      */
+    @JvmStatic
     public val audioburstLibrary: AudioburstLibrary
         get() = if (_audioburstLibrary == null) {
             error(ERROR_MESSAGE)
         } else {
             _audioburstLibrary!!
         }
+
+    private val isInjected: Boolean
+        get() = _burstPlayer != null && _audioburstLibrary != null && this::mediaSessionConnection.isInitialized
+
+    /**
+     * This flag indicates whether library is initialized or not. When library is not initialized you
+     * may experience that calling playback functions of the library will not take any effect.
+     */
+    @JvmStatic
+    public val isInitialized: Boolean
+        get() = isInjected && mediaSessionConnection.isConnected
 
     /**
      * The function that initializes library. It should be used in the entry point of your application
@@ -51,9 +64,12 @@ public object AudioburstPlayerCore {
      * @param context Context of the application.
      * @param applicationKey Key obtained from Audioburst Publishers (https://publishers.audioburst.com/).
      */
+    @JvmStatic
     public fun init(context: Context, applicationKey: String) {
-        Injector.init(context, applicationKey)
-        Injector.inject(this)
+        if (!isInjected) {
+            Injector.init(context, applicationKey)
+            Injector.inject(this)
+        }
         initMediaSession()
     }
 
@@ -62,11 +78,22 @@ public object AudioburstPlayerCore {
     }
 
     /**
+     * This function lets you stop the player and release resources. It means that after calling this
+     * function library is not initialized anymore and if you want to keep using it, you need to call
+     * [init] function again.
+     */
+    @JvmStatic
+    public fun stop() {
+        mediaSessionConnection.disconnect()
+    }
+
+    /**
      * Use this function to get all of the available [PlaylistInfo].
      *
      * @return [Result.Data] when it was possible to get requested resource. In case there was a problem getting it
      * [Result.Error] will be returned with a proper ([LibraryError]).
      */
+    @JvmStatic
     public suspend fun getPlaylists(): Result<List<PlaylistInfo>> =
         audioburstLibrary.getPlaylists()
 
@@ -78,6 +105,7 @@ public object AudioburstPlayerCore {
      *
      * @return [Flow] of [Result] of [PendingPlaylist] which describes whether whole playlist is ready.
      */
+    @JvmStatic
     public suspend fun getPersonalPlaylist(): Flow<Result<PendingPlaylist>> =
         audioburstLibrary.getPersonalPlaylist()
 
@@ -87,6 +115,7 @@ public object AudioburstPlayerCore {
      * @return [Result.Data] when it was possible to get requested resource. In case there was a problem getting it
      * [Result.Error] will be returned with a proper ([LibraryError]).
      */
+    @JvmStatic
     public suspend fun getPlaylist(playlistInfo: PlaylistInfo): Result<Playlist> =
         audioburstLibrary.getPlaylist(playlistInfo)
 
@@ -96,6 +125,7 @@ public object AudioburstPlayerCore {
      * @return [Result.Data] when it was possible to get requested resource. In case there was a problem getting it
      * [Result.Error] will be returned with a proper ([LibraryError]).
      */
+    @JvmStatic
     public suspend fun getPlaylist(byteArray: ByteArray): Result<Playlist> =
         audioburstLibrary.getPlaylist(byteArray)
 
@@ -106,6 +136,7 @@ public object AudioburstPlayerCore {
      * you will get [LibraryError.NoSearchResults]. In case there was a problem getting it [Result.Error] will be returned
      * with a proper error ([LibraryError]).
      */
+    @JvmStatic
     public suspend fun search(query: String): Result<Playlist> =
         audioburstLibrary.search(query)
 
@@ -117,6 +148,7 @@ public object AudioburstPlayerCore {
      * @return [Result.Data] when it was possible to get requested resource. In case there was a problem getting it
      * [Result.Error] will be returned with a proper ([LibraryError]).
      */
+    @JvmStatic
     public suspend fun setAudioburstUserID(userId: String): Result<Boolean> =
         audioburstLibrary.setAudioburstUserID(userId)
 
@@ -129,6 +161,7 @@ public object AudioburstPlayerCore {
      *
      * @param burstId Id of the [Burst] whose CTA button has been clicked.
      */
+    @JvmStatic
     public fun ctaButtonClick(burstId: String) {
         audioburstLibrary.ctaButtonClick(burstId)
     }
@@ -138,6 +171,7 @@ public object AudioburstPlayerCore {
      *
      * @param enabled Controls whether already listened [Burst]s should be filtered-out
      */
+    @JvmStatic
     public fun filterListenedBursts(enabled: Boolean) {
         audioburstLibrary.filterListenedBursts(enabled)
     }
@@ -148,6 +182,7 @@ public object AudioburstPlayerCore {
      * @param playlist The [Playlist] to load.
      * @param playWhenReady Whether playback should proceed when ready.
      */
+    @JvmStatic
     public fun load(playlist: Playlist, playWhenReady: Boolean) {
         burstPlayer.load(playlist, playWhenReady)
     }
@@ -155,6 +190,7 @@ public object AudioburstPlayerCore {
     /**
      * Trying to start playback if there is any [Playlist] ready.
      */
+    @JvmStatic
     public fun play() {
         burstPlayer.play()
     }
@@ -162,6 +198,7 @@ public object AudioburstPlayerCore {
     /**
      * Pauses playback.
      */
+    @JvmStatic
     public fun pause() {
         burstPlayer.pause()
     }
@@ -171,6 +208,7 @@ public object AudioburstPlayerCore {
      *
      * @return Whether it was possible to move to next.
      */
+    @JvmStatic
     public fun next(): Boolean =
         burstPlayer.next()
 
@@ -179,6 +217,7 @@ public object AudioburstPlayerCore {
      *
      * @return Whether it was possible to move to previous.
      */
+    @JvmStatic
     public fun previous(): Boolean =
         burstPlayer.previous()
 }

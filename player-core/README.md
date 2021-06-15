@@ -31,12 +31,24 @@ android {
 ```
 
 ### Step 2. Initialize `AudioburstPlayerCore` object
-You should initialize `AudioburstPlayerCore` in the `onCreate` function of the class that extends `Application` in your app.
+You should initialize `AudioburstPlayerCore` in the `onCreate` function of the class that extends `Application` in your app. Library is initialized until you call `stop` function.
 ```kotlin
 AudioburstPlayerCore.init(
     context = context,
     applicationKey = "YOUR_API_KEY_HERE"
 )
+```
+
+## Stop and release
+The library exposes an ability to stop playback and release all resources. After you call this function library is not initialized anymore and if you want to start playback again you need to call `init` function again.
+```kotlin
+AudioburstPlayerCore.stop()
+```
+
+## Query library state
+You can check whether library is initialized or not by accessing `isInitialized` flag. Please note that when library is not initialized you may experience that calling playback functions of the library will not take any effect.
+```kotlin
+AudioburstPlayerCore.isInitialized
 ```
 
 ## Legacy support
