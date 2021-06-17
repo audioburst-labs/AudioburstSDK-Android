@@ -10,6 +10,7 @@ import androidx.media.MediaBrowserServiceCompat
 import com.audioburst.library.AudioburstLibrary
 import com.audioburst.library.models.PlaybackState
 import com.audioburst.library.utils.PlaybackStateListener
+import com.audioburst.player.core.AudioburstPlayerCore
 import com.audioburst.player.core.di.Injector
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -31,6 +32,9 @@ internal class MediaService : MediaBrowserServiceCompat() {
     private val tag = this::class.java.simpleName
 
     override fun onCreate() {
+        if (!AudioburstPlayerCore.isInjected) {
+            AudioburstPlayerCore.init(this)
+        }
         Injector.inject(this)
         super.onCreate()
 

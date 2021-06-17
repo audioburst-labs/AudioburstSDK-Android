@@ -1,6 +1,7 @@
 package com.audioburst.player.core
 
 import android.content.Context
+import android.content.pm.PackageManager
 import com.audioburst.library.AudioburstLibrary
 import com.audioburst.library.models.*
 import com.audioburst.player.core.AudioburstPlayerCore.init
@@ -20,7 +21,9 @@ import kotlinx.coroutines.flow.Flow
 public object AudioburstPlayerCore {
 
     internal lateinit var mediaSessionConnection: MediaSessionConnection
-    private const val ERROR_MESSAGE = "Library is not initialized. You should call AudioburstPlayerCore.init first."
+    private const val APP_KEY_METADATA_KEY = "com.audioburst.applicationKey"
+    private const val INIT_ERROR_MESSAGE = "Library is not initialized. You should call AudioburstPlayerCore.init first."
+    private const val MISSING_METADATA_ERROR_MESSAGE = "You need to either call AudioburstPlayerCore.init(context, applicationKey) first or put applicationKey into the AndroidManifest.xml under meta-data tag with \"$APP_KEY_METADATA_KEY\" key."
 
     internal var _burstPlayer: BurstPlayer? = null
     /**
@@ -29,7 +32,7 @@ public object AudioburstPlayerCore {
     @JvmStatic
     public val burstPlayer: BurstPlayer
         get() = if (_burstPlayer == null) {
-            error(ERROR_MESSAGE)
+            error(INIT_ERROR_MESSAGE)
         } else {
             _burstPlayer!!
         }
@@ -41,12 +44,12 @@ public object AudioburstPlayerCore {
     @JvmStatic
     public val audioburstLibrary: AudioburstLibrary
         get() = if (_audioburstLibrary == null) {
-            error(ERROR_MESSAGE)
+            error(INIT_ERROR_MESSAGE)
         } else {
             _audioburstLibrary!!
         }
 
-    private val isInjected: Boolean
+    internal val isInjected: Boolean
         get() = _burstPlayer != null && _audioburstLibrary != null && this::mediaSessionConnection.isInitialized
 
     /**
@@ -71,6 +74,20 @@ public object AudioburstPlayerCore {
             Injector.inject(this)
         }
         initMediaSession()
+    }
+
+    /**
+     * The function that initializes library. It should be used in the entry point of your application
+     * (class that extends [Application]). To be able to use this function you need to first put applicationKey
+     * into AndroidManifest.xml under meta-data tag with "com.audioburst.applicationKey" key.
+     *
+     * @param context Context of the application.
+     */
+    @JvmStatic
+    public fun init(context: Context) {
+        val appInfo = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA)
+        val applicationKey = appInfo.metaData?.getString(APP_KEY_METADATA_KEY) ?: error(MISSING_METADATA_ERROR_MESSAGE)
+        init(context, applicationKey)
     }
 
     private fun initMediaSession() {

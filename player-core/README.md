@@ -39,6 +39,18 @@ AudioburstPlayerCore.init(
 )
 ```
 
+Another option to initialize the library is to put `applicationKey` into the AndroidManifest.xml file, under meta-data tag with "com.audioburst.applicationKey" name:
+```xml
+<meta-data
+    android:name="com.audioburst.applicationKey"
+    android:value="YOUR_API_KEY_HERE">
+</meta-data>
+```
+Later you can call `init` method without passing "applicationKey":
+```kotlin
+AudioburstPlayerCore.init(context)
+```
+
 ## Stop and release
 The library exposes an ability to stop playback and release all resources. After you call this function library is not initialized anymore and if you want to start playback again you need to call `init` function again.
 ```kotlin
