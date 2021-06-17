@@ -54,7 +54,13 @@ afterEvaluate {
                             dependenciesNode.appendNode("dependency").apply {
                                 appendNode("groupId", it.group)
                                 appendNode("artifactId", it.name)
-                                appendNode("version", it.version)
+                                val version = if (it.name == "mobile-library") {
+                                    // Maven's equivalent of 0.0.+
+                                    "[0.0,0.1)"
+                                } else {
+                                    it.version
+                                }
+                                appendNode("version", version)
                             }
                         }
                     }
