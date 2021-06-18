@@ -3,6 +3,9 @@ plugins {
     id("kotlin-android")
 }
 
+group = Constants.Library.packageName
+version = Constants.Library.version
+
 android {
     compileSdkVersion(30)
 

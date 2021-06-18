@@ -4,8 +4,9 @@ plugins {
     id(Dependencies.Plugins.explicitApiMode)
 }
 
-val archiveName by extra(Constants.Library.Core.archiveName)
-val projectDescription by extra(Constants.Library.Core.projectDescription)
+val project = Constants.Library.Core
+val archiveName by extra(project.archiveName)
+val projectDescription by extra(project.projectDescription)
 
 android {
     val sharedTestDir = "src/sharedTest/java"
@@ -19,6 +20,6 @@ android {
 
 dependencies {
     exoPlayerDependencies()
-    implementation(Dependencies.MobileLibrary.library)
+    api(Dependencies.MobileLibrary.library)
     testImplementation(Dependencies.OkHttp.mockWebServer)
 }

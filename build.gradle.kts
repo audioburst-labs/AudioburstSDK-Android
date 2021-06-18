@@ -1,4 +1,5 @@
 buildscript {
+    val kotlin_version by extra("1.5.0-release-764")
     repositories {
         google()
         mavenCentral()
@@ -6,6 +7,7 @@ buildscript {
     dependencies {
         classpath(Dependencies.Plugins.buildGradle)
         classpath(Dependencies.Plugins.kotlinGradle)
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
     }
 }
 

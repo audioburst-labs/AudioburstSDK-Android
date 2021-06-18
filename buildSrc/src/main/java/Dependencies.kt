@@ -8,9 +8,22 @@ object Constants {
         const val packageName = "com.audioburst"
         const val version = projectVersion
 
-        object Core {
-            const val archiveName = "player-core"
-            const val projectDescription = "AudioburstSDK is the SDK for Android that lets you access Audioburst content and add playback functionality to your app."
+        object Core : Project {
+            override val archiveName = "player-core"
+            override val projectDescription = "AudioburstSDK is the SDK for Android that lets you access Audioburst content and add playback functionality to your app."
+        }
+
+        object Controller : Project {
+            override val archiveName = "player-controller"
+            override val projectDescription = "Use this library to build your own player that will let you play Audioburst's content."
+        }
+
+        interface Project {
+            val archiveName: String
+            val projectDescription: String
+
+            val projectName: String
+                get() = ":$archiveName"
         }
     }
 }
