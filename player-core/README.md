@@ -136,9 +136,8 @@ AudioburstPlayerCore.search(query)
 ## Get Personalized Playlist using async
 The library includes the capability to get a personalized playlist constructed according to a user’s preferences. In order to shorten the loading time of the personalized playlist, the library exposes the ability to "subscribe" to ongoing changes in the playlist. Subscribing enables notifications every time new `Burst`s are added to the playlist and the ability to check if the playlist is ready.
 
-Please remember that your user needs to have at least one [Key](https://github.com/audioburst-labs/AudioburstMobileLibrary/blob/master/src/commonMain/kotlin/com/audioburst/library/models/UserPreferences.kt#L99) selected, otherwise `LibraryError.NoKeysSelected` will be returned.
 ```kotlin
-audioburstLibrary
+AudioburstPlayerCore
     .getPersonalPlaylist()
     .collect { result ->
         result
@@ -155,18 +154,41 @@ audioburstLibrary
     }
 ```
 
+Before you request PersonalPlaylist, you need to have at least one [Key](https://github.com/audioburst-labs/AudioburstMobileLibrary/blob/master/src/commonMain/kotlin/com/audioburst/library/models/UserPreferences.kt#L99) selected, otherwise `LibraryError.NoKeysSelected` will be returned.
+To do so you need to use `AudioburstLibrary` to which you can get reference by calling `AudioburstPlayerCore.audioburstLibrary`
+
+```kotlin
+AudioburstPlayerCore.audioburstLibrary.getUserPreferences()
+    .onData { userPreferences ->
+        // Use user preferences
+    }
+    .onError { error ->
+        // Handle error
+    }
+```
+
+```kotlin
+AudioburstPlayerCore.audioburstLibrary.setUserPreferences(userPreferences)
+    .onData { userPreferences ->
+        // Use updated user preferences
+    }
+    .onError { error ->
+        // Handle error
+    }
+```
+
 ## Use Cta Data
 `Burst` class exposes nullable `CtaData`, which you can use to show a CTA (Call to action) button which prompts the user to an immediate response.
 The CtaData, when available, provides the text to be shown on the button (`buttonText`) and the link (`url`) to open in the browser upon clicking the button.
 When the user clicks this button, you should call the following function to inform the library about this:
 ```kotlin
-audioburstLibrary.ctaButtonClick(burstId)
+AudioburstPlayerCore.ctaButtonClick(burstId)
 ```
 
 ## Filter out listened Bursts
 By default, library will filter-out all Bursts that the user has already listened to. Use `filterListenedBursts` function to change this behaviour.
 ```kotlin
-audioburstLibrary.filterListenedBursts(isEnabled)
+AudioburstPlayerCore.filterListenedBursts(isEnabled)
 ```
 
 ### Step 4. Inform library about current playback state
