@@ -64,11 +64,8 @@ internal class MediaService : MediaBrowserServiceCompat() {
 
     private fun observePlayingState() {
         burstPlayer.playbackState
-            .map { it.isPlaying }
-            .debounce(timeoutMillis = 100)
-            .distinctUntilChanged()
-            .onEach { isPlaying ->
-                if (isPlaying) {
+            .onEach { playbackState ->
+                if (playbackState.isPlaying) {
                     audioburstLibrary.start()
                 } else {
                     audioburstLibrary.stop()
