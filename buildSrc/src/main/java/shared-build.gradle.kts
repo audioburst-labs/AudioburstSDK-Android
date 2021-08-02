@@ -14,6 +14,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFile("proguard-rules.pro")
+        buildConfigField("String", "LIBRARY_VERSION", "\"${Constants.Library.version}\"")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

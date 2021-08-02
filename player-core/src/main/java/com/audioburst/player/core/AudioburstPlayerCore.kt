@@ -2,8 +2,10 @@ package com.audioburst.player.core
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.audioburst.android.BuildConfig
 import com.audioburst.library.AudioburstLibrary
 import com.audioburst.library.models.*
+import com.audioburst.player.BuildConfig.*
 import com.audioburst.player.core.AudioburstPlayerCore.init
 import com.audioburst.player.core.di.Injector
 import com.audioburst.player.core.media.BurstPlayer
@@ -74,6 +76,7 @@ public object AudioburstPlayerCore {
             Injector.inject(this)
         }
         initMediaSession()
+        audioburstLibrary.setSdkInfo(level = SdkLevel.Core, version = LIBRARY_VERSION)
     }
 
     /**
