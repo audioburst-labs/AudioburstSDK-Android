@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="audioburst_player_controller_duration_unknown">--:--</string>
+    <string name="audioburst_player_controller_duration_format">%d:%02d</string>
+    <string name="audioburst_player_controller_switch_source_button_full_show">Full Show</string>
+    <string name="audioburst_player_controller_switch_source_button_go_back">Go Back</string>
+    <string name="audioburst_player_controller_date_unavailable">Unavailable</string>
+    <string name="audioburst_player_controller_burst_aired_time_now">Aired just now</string>
+
+    <plurals name="audioburst_player_controller_years_ago">
+        <item quantity="one">"%d year ago"</item>
+        <item quantity="other">"%d years ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_months_ago">
+        <item quantity="one">"%d month ago"</item>
+        <item quantity="other">"%d months ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_weeks_ago">
+        <item quantity="one">"%d week ago"</item>
+        <item quantity="other">"%d weeks ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_days_ago">
+        <item quantity="one">"%d day ago"</item>
+        <item quantity="other">"%d days ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_hours_ago">
+        <item quantity="one">"%d hour ago"</item>
+        <item quantity="other">"%d hours ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_minutes_ago">
+        <item quantity="one">"%d minute ago"</item>
+        <item quantity="other">"%d minutes ago"</item>
+    </plurals>
+    <plurals name="audioburst_player_controller_seconds_ago">
+        <item quantity="one">"%d second ago"</item>
+        <item quantity="other">"%d seconds ago"</item>
+    </plurals>
+</resources>

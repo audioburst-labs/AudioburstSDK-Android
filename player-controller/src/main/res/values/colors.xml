@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="audioburst_player_controller_pink">#E0008A</color>
+    <color name="audioburst_player_controller_default_color">@color/audioburst_player_controller_pink</color>
+    <color name="audioburst_player_controller_gradient_default_start">@color/audioburst_player_controller_pink</color>
+    <color name="audioburst_player_controller_gradient_default_end">#6e21ff</color>
+
+    <color name="audioburst_player_controller_first_top">#3751ff</color>
+    <color name="audioburst_player_controller_first_bottom">#8021ff</color>
+
+    <color name="audioburst_player_controller_second_top">#ff4b7f</color>
+    <color name="audioburst_player_controller_second_bottom">#ff6433</color>
+
+    <color name="audioburst_player_controller_third_top">#9920cc</color>
+    <color name="audioburst_player_controller_third_bottom">#cf5bff</color>
+
+    <color name="audioburst_player_controller_fourth_top">#b50047</color>
+    <color name="audioburst_player_controller_fourth_bottom">#e40049</color>
+
+    <color name="audioburst_player_controller_fifth_top">#500c99</color>
+    <color name="audioburst_player_controller_fifth_bottom">#7b00fe</color>
+
+    <color name="audioburst_player_controller_sixth_top">#2dcbc6</color>
+    <color name="audioburst_player_controller_sixth_bottom">#50b6d4</color>
+
+    <color name="audioburst_player_controller_seventh_top">#ff2a73</color>
+    <color name="audioburst_player_controller_seventh_bottom">#ff6396</color>
+
+    <color name="audioburst_player_controller_eighth_top">#0186a4</color>
+    <color name="audioburst_player_controller_eighth_bottom">#00ce97</color>
+
+    <color name="audioburst_player_controller_ninth_top">#4c8ec3</color>
+    <color name="audioburst_player_controller_ninth_bottom">#6f22f0</color>
+
+    <color name="audioburst_player_controller_tenth_top">#0157b6</color>
+    <color name="audioburst_player_controller_tenth_bottom">#012e50</color>
+
+    <color name="audioburst_player_controller_eleventh_top">#ff9700</color>
+    <color name="audioburst_player_controller_eleventh_bottom">#ffe100</color>
+
+    <color name="audioburst_player_controller_twelfth_top">#00c5c0</color>
+    <color name="audioburst_player_controller_twelfth_bottom">#00ffc2</color>
+
+    <color name="audioburst_player_controller_thirteenth_top">#3651ff</color>
+    <color name="audioburst_player_controller_thirteenth_bottom">#8020ff</color>
+
+    <color name="audioburst_player_controller_fourteenth_top">#ff1e99</color>
+    <color name="audioburst_player_controller_fourteenth_bottom">#ffae2f</color>
+
+    <color name="audioburst_player_controller_fifteenth_top">#ff00cf</color>
+    <color name="audioburst_player_controller_fifteenth_bottom">#c41ed9</color>
+
+    <color name="audioburst_player_controller_sixteenth_top">#42b9ff</color>
+    <color name="audioburst_player_controller_sixteenth_bottom">#c771f1</color>
+</resources>

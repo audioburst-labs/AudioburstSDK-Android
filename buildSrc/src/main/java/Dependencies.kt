@@ -39,6 +39,13 @@ object Dependencies {
         const val buildGradle = "com.android.tools.build:gradle:4.2.0"
     }
 
+    object Android {
+        object Ktx {
+            private const val version = "1.5.0"
+            const val core = "androidx.core:core-ktx:$version"
+        }
+    }
+
     object Kotlin {
         const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     }
@@ -77,6 +84,11 @@ object Dependencies {
             const val core = "androidx.test:core:$version"
             const val rules = "androidx.test:rules:$version"
         }
+    }
+
+    object JdkDesugar {
+        private const val version = "1.1.5"
+        const val desugar = "com.android.tools:desugar_jdk_libs:$version"
     }
 }
 
