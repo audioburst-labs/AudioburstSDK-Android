@@ -9,10 +9,6 @@ import com.audioburst.player.controller.extensions.airedText
 import com.audioburst.player.controller.extensions.verticalGradient
 import com.audioburst.player.controller.models.*
 import com.audioburst.player.controller.utils.*
-import com.audioburst.player.controller.utils.DateUtils
-import com.audioburst.player.controller.utils.ListenedBurstIds
-import com.audioburst.player.controller.utils.PlayerStyleHolder
-import com.audioburst.player.controller.utils.UrlOpener
 import com.audioburst.player.core.media.BurstPlayer
 import com.audioburst.player.core.models.MediaUrl
 import com.audioburst.player.core.models.NowPlaying
@@ -25,7 +21,7 @@ import com.audioburst.library.models.UiEvent as LibrarysUiEvent
 internal class BurstPlayerController(
     private val burstPlayer: BurstPlayer,
     private val scope: CoroutineScope,
-    private val resourceProvider: ResourceProvider,
+    override val resourceProvider: ResourceProvider,
     private val listenedBurstIds: ListenedBurstIds,
     private val playerStyleHolder: PlayerStyleHolder,
     private val urlOpener: UrlOpener,
@@ -59,11 +55,15 @@ internal class BurstPlayerController(
     private val _adOverlay = MutableStateFlow(AdOverlayState())
     override val adOverlay = _adOverlay.asStateFlow()
 
+    override val playerStyle: StateFlow<PlayerStyle> = playerStyleHolder.playerStyle
+
     init {
         observeCurrentPlaylist()
         observeNowPlaying()
         observeAdState()
         observeState()
+        observeStyle()
+        observeTime()
     }
 
     private fun observeCurrentPlaylist() {
@@ -101,12 +101,7 @@ internal class BurstPlayerController(
                 _playerState.value = _playerState.value.copy(
                     title = media.burst.showName,
                     subtitle = media.burst.title,
-//                    maxProgress = media.duration.toInt(),
-//                    actionButton = media.burst.ctaData?.let { ctaData ->
-//                        MiniPlayerView.ActionButton(ctaData.buttonText) {
-//                            onCtaButtonClick(ctaData)
-//                        }
-//                    }
+                    ctaButtonText = media.burst.ctaData?.buttonText,
                 )
             }
             .launchIn(scope)
@@ -127,14 +122,27 @@ internal class BurstPlayerController(
         burstPlayer.adState
             .onEach { adState ->
                 _adOverlay.value = _adOverlay.value.copy(
-                    adTimeLeft = adTimeLeft() ?: 0,
-                    isVisible = adState != null,
+                    isVisible = adState != null && adState.isAvailableInCurrentMedia,
                     isSkipButtonVisible = adState?.canSkip == true,
                 )
 
                 _playerProgressBar.value = _playerProgressBar.value.copy(
                     isSeekable = adState?.isAvailableInCurrentMedia == false || (adState?.isAvailableInCurrentMedia == true && adState.canSkip)
                 )
+            }
+            .launchIn(scope)
+
+        val adAvailability = burstPlayer.adState
+            .filterNotNull()
+            .filter { it.isAvailableInCurrentMedia }
+            .map { it.isAvailableInCurrentMedia }
+        _playerProgressBar
+            .combine(adAvailability) { _, isAvailableInCurrentMedia ->
+                if (isAvailableInCurrentMedia) {
+                    _adOverlay.value = _adOverlay.value.copy(
+                        adTimeLeft = adTimeLeft() ?: 0,
+                    )
+                }
             }
             .launchIn(scope)
     }
@@ -153,6 +161,27 @@ internal class BurstPlayerController(
             .launchIn(scope)
     }
 
+    private fun observeStyle() {
+        playerStyleHolder.playerStyle
+            .onEach { playerStyle ->
+                _cardItems.value = _cardItems.value.map { it.copy(playerStyle = playerStyle) }
+                _listItems.value = _listItems.value.map { it.copy(playerStyle = playerStyle) }
+            }
+            .launchIn(scope)
+    }
+
+    private fun observeTime() {
+        burstPlayer.playbackTime(100.0.toDuration(DurationUnit.Milliseconds))
+            .onEach {
+                val playbackPosition = it.playbackPosition.milliseconds
+                _playerProgressBar.value = _playerProgressBar.value.copy(
+                    currentProgress = playbackPosition.toInt(),
+                    progressText = DateUtils.formatAsTime(playbackPosition.toLong(), resourceProvider)
+                )
+            }
+            .launchIn(scope)
+    }
+
     private fun items(bursts: List<Burst>): List<PlaylistCardItem> =
         bursts.map { burst ->
             PlaylistCardItem(
@@ -162,7 +191,7 @@ internal class BurstPlayerController(
                 timeText = burst.airedText(resourceProvider),
                 title = burst.title,
                 isLoadingFullShow = false,
-                colorAccent = playerStyleHolder.playerStyle.value.colorAccent,
+                playerStyle = playerStyleHolder.playerStyle.value,
                 gradient = burst.verticalGradient,
                 callback = ::onEvent,
             )
@@ -186,7 +215,7 @@ internal class BurstPlayerController(
                 subtitle = burst.showName,
                 rightText = rightText(burst, nowPlayingId),
                 isPlaying = burst.id == nowPlayingId,
-                theme = playerStyleHolder.playerStyle.value.playerTheme,
+                playerStyle = playerStyleHolder.playerStyle.value,
                 callback = ::onEvent
             )
         }
@@ -299,5 +328,6 @@ internal class BurstPlayerController(
         get() = when (this) {
             is UiEvent.BurstIndicator.BurstId -> burstPlayer.currentPlaylist.value?.bursts?.firstOrNull { it.id == value }
             is UiEvent.BurstIndicator.Position -> burstPlayer.currentPlaylist.value?.bursts?.getOrNull(value)
+            UiEvent.BurstIndicator.CurrentlyPlaying -> currentBurst()
         }
 }

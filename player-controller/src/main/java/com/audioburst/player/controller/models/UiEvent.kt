@@ -22,5 +22,6 @@ public sealed class UiEvent {
     public sealed class BurstIndicator {
         public class BurstId(internal val value: String) : BurstIndicator()
         public class Position(internal val value: Int) : BurstIndicator()
+        public object CurrentlyPlaying : BurstIndicator()
     }
 }

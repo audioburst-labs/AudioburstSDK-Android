@@ -15,6 +15,8 @@ public sealed class Color {
     public companion object {
 
         public val DEFAULT: Color = Resource(R.color.audioburst_player_controller_default_color)
+
+        public val WHITE: Color = Resource(R.color.audioburst_player_controller_white)
     }
 }
 

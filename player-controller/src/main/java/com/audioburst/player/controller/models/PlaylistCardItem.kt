@@ -8,6 +8,6 @@ public data class PlaylistCardItem(
     val title: String,
     val gradient: Gradient,
     val isLoadingFullShow: Boolean,
-    val colorAccent: Color,
+    val playerStyle: PlayerStyle,
     val callback: (UiEvent) -> Unit,
 )

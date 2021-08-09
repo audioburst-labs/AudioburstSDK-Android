@@ -1,7 +1,8 @@
 package com.audioburst.player.controller.models
 
-internal data class PlayerStyle(
+public data class PlayerStyle(
     val playerTheme: PlayerTheme,
     val colorAccent: Color = Color.DEFAULT,
     val gradient: Gradient = Gradient.Horizontal.DEFAULT,
+    val gradientTint: Color = Color.WHITE,
 )

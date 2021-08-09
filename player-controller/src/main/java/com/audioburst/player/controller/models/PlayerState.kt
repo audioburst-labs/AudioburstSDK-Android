@@ -15,7 +15,6 @@ public data class PlayerState(
     val shareOptions: ShareOptions? = null,
     val isLoadingShareUrl: Boolean = false,
     val isShareButton: Boolean = false,
-    val colorTint: Color = Color.DEFAULT,
     val playlistButtonState: PlaylistButtonState = PlaylistButtonState.Cards,
 ) {
 

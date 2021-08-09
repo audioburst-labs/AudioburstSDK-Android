@@ -5,9 +5,8 @@ public data class PlaylistItem(
     val title: String?,
     val subtitle: String?,
     val rightText: RightText,
-    val theme: PlayerTheme? = null,
     val isPlaying: Boolean = false,
-    val color: Color = Color.DEFAULT,
+    val playerStyle: PlayerStyle,
     val callback: (UiEvent) -> Unit,
 ) {
 

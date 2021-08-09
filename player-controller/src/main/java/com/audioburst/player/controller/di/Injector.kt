@@ -1,6 +1,7 @@
 package com.audioburst.player.controller.di
 
 import android.content.Context
+import com.audioburst.library.AudioburstLibrary
 import com.audioburst.player.controller.AudioburstPlayerController
 import com.audioburst.player.controller.BurstPlayerController
 import com.audioburst.player.controller.PlayerController
@@ -33,6 +34,10 @@ internal object Injector {
     private val resourceProviderProvider: Provider<ResourceProvider> = provider { AndroidResourceProvider(applicationContext) }
     private val libraryScopeProvider: Provider<CoroutineScope> = provider { libraryScope }
     private val burstPlayerProvider: Provider<BurstPlayer> = provider { AudioburstPlayerCore.burstPlayer }
+    private val urlOpenerProvider: Provider<UrlOpener> = provider {
+        AndroidUrlOpener(context = applicationContext)
+    }
+    private val audioburstLibraryProvider: Provider<AudioburstLibrary> = provider { AudioburstPlayerCore.audioburstLibrary }
     private val playerControllerProvider: Provider<PlayerController> = provider {
         BurstPlayerController(
             burstPlayer = burstPlayerProvider.get(),
@@ -40,6 +45,8 @@ internal object Injector {
             resourceProvider = resourceProviderProvider.get(),
             listenedBurstIds = listenedBurstIdsProvider.get(),
             playerStyleHolder = playerStyleHolderProvider.get(),
+            urlOpener = urlOpenerProvider.get(),
+            audioburstLibrary = audioburstLibraryProvider.get(),
         )
     }
 
