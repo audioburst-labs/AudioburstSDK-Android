@@ -40,7 +40,7 @@ internal class MediaModule(
     private val mediaTotalPlayTimeProvider: Provider<MediaTotalPlayTimeProvider> = provider {
         AnalyticCollectorMediaTotalPlayTimeProvider(analyticsCollector = analyticsCollectorProvider.get())
     }
-    private val playerEventFlowProvider: Provider<PlayerEventFlow> = provider {
+    val playerEventFlowProvider: Provider<PlayerEventFlow> = provider {
         ExoPlayerEventsFlow(
             exoPlayer = exoPlayerProvider.get(),
             appDispatchers = appDispatchersProvider.get(),

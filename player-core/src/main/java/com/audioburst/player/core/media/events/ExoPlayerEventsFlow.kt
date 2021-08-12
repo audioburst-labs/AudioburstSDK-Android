@@ -34,6 +34,24 @@ internal class ExoPlayerEventsFlow(
                         offer(PlayerEvent.Error.UnsupportedUrlException(cause.url))
                     }
                 }
+
+                override fun onPlaybackStateChanged(state: Int) {
+                    offer(
+                        PlayerEvent.PlayerStateChanged(
+                            playWhenReady = exoPlayer.playWhenReady,
+                            playbackState = state,
+                        )
+                    )
+                }
+
+                override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+                    offer(
+                        PlayerEvent.PlayerStateChanged(
+                            playWhenReady = playWhenReady,
+                            playbackState = exoPlayer.playbackState,
+                        )
+                    )
+                }
             }
 
             exoPlayer.addListener(listener)

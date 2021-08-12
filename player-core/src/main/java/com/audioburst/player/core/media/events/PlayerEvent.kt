@@ -7,4 +7,6 @@ internal sealed class PlayerEvent {
     sealed class Error : PlayerEvent() {
         class UnsupportedUrlException(val url: String) : Error()
     }
+
+    data class PlayerStateChanged(val playWhenReady: Boolean, val playbackState: Int) : PlayerEvent()
 }

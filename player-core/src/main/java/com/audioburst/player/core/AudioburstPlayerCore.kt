@@ -8,6 +8,7 @@ import com.audioburst.player.core.AudioburstPlayerCore.init
 import com.audioburst.player.core.di.Injector
 import com.audioburst.player.core.media.BurstPlayer
 import com.audioburst.player.core.media.MediaSessionConnection
+import com.audioburst.player.core.media.PlaybackNotificationController
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.Flow
 public object AudioburstPlayerCore {
 
     internal lateinit var mediaSessionConnection: MediaSessionConnection
+    internal lateinit var playbackNotificationController: PlaybackNotificationController
     private const val APP_KEY_METADATA_KEY = "com.audioburst.applicationKey"
     private const val INIT_ERROR_MESSAGE = "Library is not initialized. You should call AudioburstPlayerCore.init first."
     private const val MISSING_METADATA_ERROR_MESSAGE = "You need to either call AudioburstPlayerCore.init(context, applicationKey) first or put applicationKey into the AndroidManifest.xml under meta-data tag with \"$APP_KEY_METADATA_KEY\" key."
@@ -59,6 +61,17 @@ public object AudioburstPlayerCore {
     @JvmStatic
     public val isInitialized: Boolean
         get() = isInjected && mediaSessionConnection.isConnected
+
+    /**
+     * Flag that indicates whether library should show Playback notification or not. While set to true
+     * playback will happen in the Foreground Service.
+     */
+    @JvmStatic
+    public var allowDisplayPlaybackNotification: Boolean = true
+        set(value) {
+            playbackNotificationController.shouldDisplayNotification.value = value
+            field = value
+        }
 
     /**
      * The function that initializes library. It should be used in the entry point of your application

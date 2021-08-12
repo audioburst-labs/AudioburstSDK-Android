@@ -83,6 +83,12 @@ internal object Injector {
             mediaSessionConnection = mediaSessionConnectionProvider.get(),
         )
     }
+    private val playbackNotificationControllerProvider: Provider<PlaybackNotificationController> = singleton {
+        PlaybackNotificationController()
+    }
+    private val notificationBuilderFactoryProvider: Provider<NotificationBuilder.Factory> = provider {
+        NotificationBuilder.Factory(context = applicationContext)
+    }
 
     fun init(context: Context, applicationKey: String) {
         applicationContext = context.applicationContext
@@ -107,12 +113,16 @@ internal object Injector {
             burstPlayer = mediaModule.burstExoPlayerProvider.get()
             audioburstLibrary = audioburstLibraryProvider.get()
             mediaControllerCallback = mediaModule.mediaControllerCallbackProvider.get()
+            notificationBuilderFactory = notificationBuilderFactoryProvider.get()
+            playbackNotificationController = playbackNotificationControllerProvider.get()
+            playerEventFlow = mediaModule.playerEventFlowProvider.get()
         }
     }
 
     fun inject(player: AudioburstPlayerCore) {
         player.apply {
             mediaSessionConnection = mediaSessionConnectionProvider.get()
+            playbackNotificationController = playbackNotificationControllerProvider.get()
             _audioburstLibrary = audioburstLibraryProvider.get()
             _burstPlayer = burstPlayerDelegate.get()
         }
