@@ -2,7 +2,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 
 object Constants {
     const val projectName = "AudioburstSDK-Android"
-    const val projectVersion = "0.0.5"
+    const val projectVersion = "0.0.6"
 
     object Library {
         const val packageName = "com.audioburst"
