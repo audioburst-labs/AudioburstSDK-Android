@@ -29,7 +29,7 @@ internal class DownloadOnlyInterceptorTest {
         val recordedRequest = server.takeRequest()
 
         // THEN
-        assert(recordedRequest.requestUrl.queryParameter("downloadType") == downloadTypeQueryParameter)
+        assert(recordedRequest.requestUrl?.queryParameter("downloadType") == downloadTypeQueryParameter)
         server.close()
     }
 

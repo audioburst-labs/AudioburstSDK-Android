@@ -10,12 +10,12 @@ internal class DownloadOnlyInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
 
-        if (!mediaUrlValidator.isValid(request.url().uri().toString())) {
+        if (!mediaUrlValidator.isValid(request.url.toString())) {
             return chain.proceed(request)
         }
 
         val url = request
-            .url()
+            .url
             .newBuilder()
             .addQueryParameter(QUERY_NAME, DOWNLOAD_ONLY.toString())
             .build()

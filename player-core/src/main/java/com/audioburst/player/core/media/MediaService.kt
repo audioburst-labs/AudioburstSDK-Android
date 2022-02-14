@@ -3,11 +3,11 @@ package com.audioburst.player.core.media
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.audioburst.library.AudioburstLibrary
@@ -23,7 +23,8 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 internal class MediaService : MediaBrowserServiceCompat() {
     lateinit var scope: CoroutineScope
@@ -50,8 +51,13 @@ internal class MediaService : MediaBrowserServiceCompat() {
         Injector.inject(this)
         super.onCreate()
 
+        val flag = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
         val activityPendingIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let { sessionIntent ->
-            PendingIntent.getActivity(this, ACTIVITY_REQUEST_CODE, sessionIntent, ACTIVITY_NO_FLAGS)
+            PendingIntent.getActivity(this, ACTIVITY_REQUEST_CODE, sessionIntent, flag)
         }
 
         mediaSession = MediaSessionCompat(this, tag).apply {
@@ -199,6 +205,5 @@ internal class MediaService : MediaBrowserServiceCompat() {
     companion object {
         private const val ROOT_ID = "root"
         private const val ACTIVITY_REQUEST_CODE = 0x213
-        private const val ACTIVITY_NO_FLAGS = 0
     }
 }

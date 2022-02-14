@@ -2,8 +2,8 @@ package com.audioburst.player.core.media.events
 
 import com.audioburst.player.core.media.UnsupportedUrlException
 import com.audioburst.player.core.models.AppDispatchers
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -28,8 +28,8 @@ internal class ExoPlayerEventsFlow(
                     offer(PlayerEvent.IsPlayingChanged(isPlaying = isPlaying))
                 }
 
-                override fun onPlayerError(error: ExoPlaybackException) {
-                    val cause = error.sourceException.cause
+                override fun onPlayerError(error: PlaybackException) {
+                    val cause = error.cause
                     if (cause is UnsupportedUrlException) {
                         offer(PlayerEvent.Error.UnsupportedUrlException(cause.url))
                     }

@@ -20,22 +20,20 @@ internal class NotificationBuilder private constructor(
     init {
         val mediaController = MediaControllerCompat(context, sessionToken)
 
-        notificationManager = PlayerNotificationManager.createWithNotificationChannel(
-            context,
-            NOW_PLAYING_CHANNEL,
-            R.string.audioburst_player_core_notification_channel,
-            R.string.audioburst_player_core_notification_channel_description,
-            NOW_PLAYING_NOTIFICATION,
-            DescriptionAdapter(mediaController),
-            notificationListener
-        ).apply {
-            setMediaSessionToken(sessionToken)
-            setSmallIcon(R.drawable.audioburst_player_core_ic_notification)
-            setUseNextAction(true)
-            setUsePreviousAction(true)
-            setUseNextActionInCompactView(true)
-            setUsePreviousActionInCompactView(true)
-        }
+        notificationManager = PlayerNotificationManager.Builder(
+            context, NOW_PLAYING_NOTIFICATION, NOW_PLAYING_CHANNEL, DescriptionAdapter(mediaController),
+        )
+            .setChannelNameResourceId(R.string.audioburst_player_core_notification_channel)
+            .setChannelDescriptionResourceId(R.string.audioburst_player_core_notification_channel_description)
+            .setNotificationListener(notificationListener)
+            .build().apply {
+                setMediaSessionToken(sessionToken)
+                setSmallIcon(R.drawable.audioburst_player_core_ic_notification)
+                setUseNextAction(true)
+                setUsePreviousAction(true)
+                setUseNextActionInCompactView(true)
+                setUsePreviousActionInCompactView(true)
+            }
     }
 
     fun hideNotification() {

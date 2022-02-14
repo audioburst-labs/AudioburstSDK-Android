@@ -12,6 +12,7 @@ internal fun playlistOf(
     bursts: List<Burst> = emptyList(),
     playerSessionId: PlayerSessionId = PlayerSessionId(""),
     playerAction: PlayerAction = playerActionOf(),
+    intent: Playlist.Intent? = null,
 ): Playlist =
     Playlist(
         id = id,
@@ -20,6 +21,7 @@ internal fun playlistOf(
         bursts = bursts,
         playerSessionId = playerSessionId,
         playerAction = playerAction,
+        intent = intent,
     )
 
 internal fun playerActionOf(

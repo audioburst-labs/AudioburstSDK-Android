@@ -36,18 +36,16 @@ object Dependencies {
     }
 
     object ExoPlayer {
-        private const val version = "2.13.3"
+        private const val version = "2.16.1"
         const val core = "com.google.android.exoplayer:exoplayer-core:$version"
         const val hls = "com.google.android.exoplayer:exoplayer-hls:$version"
         const val ui = "com.google.android.exoplayer:exoplayer-ui:$version"
         const val mediaSession = "com.google.android.exoplayer:extension-mediasession:$version"
         const val okHttp = "com.google.android.exoplayer:extension-okhttp:$version"
-        const val testUtil = "com.google.android.exoplayer:exoplayer-testutils:$version"
-        const val robolectricUtils = "com.google.android.exoplayer:exoplayer-robolectricutils:$version"
     }
 
     object OkHttp {
-        private const val version = "3.12.11"
+        private const val version = "4.9.3"
         val mockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
     }
 

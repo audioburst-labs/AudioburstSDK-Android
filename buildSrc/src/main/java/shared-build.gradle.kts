@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(30)
+    compileSdkVersion(32)
 
     defaultConfig {
         minSdkVersion(22)
-        targetSdkVersion(30)
+        targetSdkVersion(32)
         versionCode = 1
         versionName = Constants.Library.version
 
